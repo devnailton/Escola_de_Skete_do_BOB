@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -13,25 +12,25 @@
             padding: 15px;
             margin-bottom: 60px;
         }
-        
+
         .form-card {
             background-color: white;
             border-radius: 8px;
             padding: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
+
         .form-group {
             margin-bottom: 15px;
         }
-        
+
         .form-label {
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
             color: #333;
         }
-        
+
         .form-control {
             width: 100%;
             padding: 10px;
@@ -39,19 +38,19 @@
             border-radius: 4px;
             font-size: 14px;
         }
-        
+
         .form-control:focus {
             outline: none;
             border-color: #FF9F1C;
             box-shadow: 0 0 5px rgba(255, 159, 28, 0.3);
         }
-        
+
         .btn-group {
             display: flex;
             gap: 10px;
             margin-top: 20px;
         }
-        
+
         .btn {
             padding: 10px 20px;
             border: none;
@@ -62,23 +61,23 @@
             text-align: center;
             font-weight: 500;
         }
-        
+
         .btn-primary {
             background-color: #FF9F1C;
             color: white;
         }
-        
+
         .btn-secondary {
             background-color: #6c757d;
             color: white;
         }
-        
+
         .alert {
             padding: 10px;
             margin-bottom: 15px;
             border-radius: 4px;
         }
-        
+
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
@@ -137,50 +136,53 @@
                 <div class="form-card">
                     <form method="POST">
                         {{ form.hidden_tag() }}
-                        
-                        {% with messages = get_flashed_messages() %}
+
+                        {% with messages = get_flashed_messages(with_categories=true) %}
                             {% if messages %}
-                                {% for message in messages %}
-                                    <div class="alert alert-danger">{{ message }}</div>
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }}">
+                                        {{ message }}
+                                    </div>
                                 {% endfor %}
                             {% endif %}
+
                         {% endwith %}
-                        
+
                         <div class="form-group">
                             {{ form.nome.label(class="form-label") }}
                             {{ form.nome(class="form-control") }}
                         </div>
-                        
+
                         <div class="form-group">
                             {{ form.responsavel.label(class="form-label") }}
                             {{ form.responsavel(class="form-control") }}
                         </div>
-                        
+
                         <div class="form-group">
                             {{ form.telefone.label(class="form-label") }}
                             {{ form.telefone(class="form-control") }}
                         </div>
-                        
+
                         <div class="form-group">
                             {{ form.email.label(class="form-label") }}
                             {{ form.email(class="form-control") }}
                         </div>
-                        
+
                         <div class="form-group">
                             {{ form.data_nascimento.label(class="form-label") }}
                             {{ form.data_nascimento(class="form-control") }}
                         </div>
-                        
+
                         <div class="form-group">
                             {{ form.turma_id.label(class="form-label") }}
                             {{ form.turma_id(class="form-control") }}
                         </div>
-                        
+
                         <div class="form-group">
                             {{ form.observacoes.label(class="form-label") }}
                             {{ form.observacoes(class="form-control", rows="3") }}
                         </div>
-                        
+
                         <div class="btn-group">
                             {{ form.submit(class="btn btn-primary") }}
                             <a href="{{ url_for('alunos') }}" class="btn btn-secondary">Cancelar</a>
@@ -196,18 +198,18 @@
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menu-toggle');
             const menuItems = document.querySelector('.menu-items');
-            
+
             const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
             menuLinks.forEach(link => {
                 link.addEventListener('click', function() {
                     menuToggle.checked = false;
                 });
             });
-            
+
             document.addEventListener('click', function(event) {
                 const isClickInsideMenu = menuItems.contains(event.target);
                 const isClickOnMenuButton = event.target.closest('.menu-button');
-                
+
                 if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
                     menuToggle.checked = false;
                 }

@@ -176,13 +176,24 @@ def novo_aluno():
     form.turma_id.choices = [(0, 'Selecione uma turma')] + [(t.id, t.nome) for t in Turma.query.all()]
     
     if form.validate_on_submit():
+        turma_id = form.turma_id.data if form.turma_id.data != 0 else None
+        
+        # Verificar capacidade da turma se uma turma foi selecionada
+        if turma_id:
+            turma = Turma.query.get(turma_id)
+            if turma and turma.capacidade_maxima:
+                alunos_na_turma = Aluno.query.filter_by(turma_id=turma_id).count()
+                if alunos_na_turma >= turma.capacidade_maxima:
+                    flash(f'Não é possível matricular o aluno. A turma "{turma.nome}" já atingiu sua capacidade máxima de {turma.capacidade_maxima} alunos.', 'error')
+                    return render_template('novo_aluno.html', form=form)
+        
         aluno = Aluno(
             nome=form.nome.data,
             responsavel=form.responsavel.data,
             telefone=form.telefone.data,
             email=form.email.data,
             data_nascimento=form.data_nascimento.data,
-            turma_id=form.turma_id.data if form.turma_id.data != 0 else None,
+            turma_id=turma_id,
             observacoes=form.observacoes.data
         )
         db.session.add(aluno)
@@ -200,12 +211,24 @@ def editar_aluno(aluno_id):
     form.turma_id.choices = [(0, 'Selecione uma turma')] + [(t.id, t.nome) for t in Turma.query.all()]
     
     if form.validate_on_submit():
+        nova_turma_id = form.turma_id.data if form.turma_id.data != 0 else None
+        turma_anterior_id = aluno.turma_id
+        
+        # Verificar capacidade da nova turma se mudou de turma
+        if nova_turma_id and nova_turma_id != turma_anterior_id:
+            turma = Turma.query.get(nova_turma_id)
+            if turma and turma.capacidade_maxima:
+                alunos_na_turma = Aluno.query.filter_by(turma_id=nova_turma_id).count()
+                if alunos_na_turma >= turma.capacidade_maxima:
+                    flash(f'Não é possível transferir o aluno. A turma "{turma.nome}" já atingiu sua capacidade máxima de {turma.capacidade_maxima} alunos.', 'error')
+                    return render_template('editar_aluno.html', form=form, aluno=aluno)
+        
         aluno.nome = form.nome.data
         aluno.responsavel = form.responsavel.data
         aluno.telefone = form.telefone.data
         aluno.email = form.email.data
         aluno.data_nascimento = form.data_nascimento.data
-        aluno.turma_id = form.turma_id.data if form.turma_id.data != 0 else None
+        aluno.turma_id = nova_turma_id
         aluno.observacoes = form.observacoes.data
         db.session.commit()
         flash('Aluno atualizado com sucesso!')
