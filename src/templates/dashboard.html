@@ -340,23 +340,94 @@
         // Script para controle do menu hamburguer
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menu-toggle');
+            const menuButton = document.querySelector('.menu-button');
             const menuItems = document.querySelector('.menu-items');
+            
+            // Debug - verificar se os elementos foram encontrados
+            console.log('Menu toggle:', menuToggle);
+            console.log('Menu button:', menuButton);
+            console.log('Menu items:', menuItems);
+            
+            // Adiciona evento de clique no botão do menu
+            if (menuButton) {
+                menuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (menuToggle) {
+                        menuToggle.checked = !menuToggle.checked;
+                        console.log('Menu toggled:', menuToggle.checked);
+                    }
+                });
+            }
+            
+            // Adiciona evento de mudança no checkbox
+            if (menuToggle) {
+                menuToggle.addEventListener('change', function() {
+                    console.log('Menu state changed:', this.checked);
+                    if (this.checked) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
             
             // Fecha o menu quando um item é clicado
             const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
             menuLinks.forEach(link => {
                 link.addEventListener('click', function() {
-                    menuToggle.checked = false;
+                    if (menuToggle) {
+                        menuToggle.checked = false;
+                        document.body.style.overflow = '';
+                    }
                 });
             });
             
             // Fecha o menu quando clicar fora dele
             document.addEventListener('click', function(event) {
+                if (!menuItems || !menuToggle) return;
+                
                 const isClickInsideMenu = menuItems.contains(event.target);
                 const isClickOnMenuButton = event.target.closest('.menu-button');
                 
                 if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
                     menuToggle.checked = false;
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Adiciona overlay para fechar o menu em mobile
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            `;
+            document.body.appendChild(overlay);
+            
+            // Controla o overlay
+            if (menuToggle) {
+                menuToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        overlay.style.display = 'block';
+                    } else {
+                        overlay.style.display = 'none';
+                    }
+                });
+            }
+            
+            // Fecha menu ao clicar no overlay
+            overlay.addEventListener('click', function() {
+                if (menuToggle) {
+                    menuToggle.checked = false;
+                    this.style.display = 'none';
+                    document.body.style.overflow = '';
                 }
             });
         });
