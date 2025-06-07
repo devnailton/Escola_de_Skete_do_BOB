@@ -1,0 +1,341 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Aluno - Escolinha de Skate do Bob</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
+    <style>
+        .view-container {
+            padding: 15px;
+            margin-bottom: 60px;
+        }
+
+        .view-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .view-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #FF9F1C;
+        }
+
+        .view-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .view-status {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        .info-value {
+            color: #333;
+            font-size: 1rem;
+            padding: 8px 0;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #FF9F1C;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .medical-info {
+            background-color: #f8f9fa;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            border-radius: 4px;
+        }
+
+        .medical-title {
+            color: #dc3545;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        @media (min-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Menu Hamburguer -->
+        <div class="menu-container">
+            <input type="checkbox" id="menu-toggle">
+            <label for="menu-toggle" class="menu-button">
+                <span class="menu-icon"></span>
+            </label>
+            <div class="menu-items">
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('alunos') }}" class="menu-item active">
+                    <i class="fas fa-user-graduate"></i> Alunos
+                </a>
+                <a href="{{ url_for('turmas') }}" class="menu-item">
+                    <i class="fas fa-users"></i> Turmas
+                </a>
+                <a href="{{ url_for('presencas') }}" class="menu-item">
+                    <i class="fas fa-clipboard-check"></i> Presenças
+                </a>
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('usuarios') }}" class="menu-item">
+                    <i class="fas fa-user-cog"></i> Usuários
+                </a>
+                {% endif %}
+                <a href="{{ url_for('documentacao') }}" class="menu-item">
+                    <i class="fas fa-book"></i> Documentação
+                </a>
+                <a href="{{ url_for('configuracoes') }}" class="menu-item">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+                <div class="menu-footer">
+                    <a href="{{ url_for('index') }}" class="btn-voltar-home">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <header class="dashboard-header">
+                <h1>Detalhes do Aluno</h1>
+                <div class="user-info">
+                    <span>Olá, {{ current_user.username }}</span>
+                </div>
+            </header>
+
+            <div class="view-container">
+                <div class="view-card">
+                    <div class="view-header">
+                        <div class="view-title">{{ aluno.nome }}</div>
+                        <div class="view-status">{{ aluno.status }}</div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="section-title">Informações Pessoais</div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Nome Completo</div>
+                                <div class="info-value">{{ aluno.nome }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Data de Nascimento</div>
+                                <div class="info-value">{{ aluno.data_nascimento.strftime('%d/%m/%Y') if aluno.data_nascimento else 'Não informado' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Responsável</div>
+                                <div class="info-value">{{ aluno.responsavel }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Telefone</div>
+                                <div class="info-value">{{ aluno.telefone or 'Não informado' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Email</div>
+                                <div class="info-value">{{ aluno.email or 'Não informado' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Data de Matrícula</div>
+                                <div class="info-value">{{ aluno.data_matricula.strftime('%d/%m/%Y') if aluno.data_matricula else 'Não informado' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="section-title">Informações Acadêmicas</div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <div class="info-label">Turma</div>
+                                <div class="info-value">{{ aluno.turma.nome if aluno.turma else 'Não atribuído' }}</div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-label">Status</div>
+                                <div class="info-value">{{ aluno.status }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if aluno.tipo_sanguineo or aluno.medicamentos or aluno.alergias %}
+                    <div class="info-section">
+                        <div class="medical-info">
+                            <div class="medical-title">
+                                <i class="fas fa-heartbeat"></i>
+                                Informações Médicas
+                            </div>
+                            <div class="info-grid">
+                                {% if aluno.tipo_sanguineo %}
+                                <div class="info-item">
+                                    <div class="info-label">Tipo Sanguíneo</div>
+                                    <div class="info-value">{{ aluno.tipo_sanguineo }}</div>
+                                </div>
+                                {% endif %}
+                                {% if aluno.medicamentos %}
+                                <div class="info-item">
+                                    <div class="info-label">Medicamentos Recorrentes</div>
+                                    <div class="info-value">{{ aluno.medicamentos }}</div>
+                                </div>
+                                {% endif %}
+                                {% if aluno.alergias %}
+                                <div class="info-item">
+                                    <div class="info-label">Alergias</div>
+                                    <div class="info-value">{{ aluno.alergias }}</div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if aluno.observacoes %}
+                    <div class="info-section">
+                        <div class="section-title">Observações</div>
+                        <div class="info-value">{{ aluno.observacoes }}</div>
+                    </div>
+                    {% endif %}
+
+                    <div class="btn-group">
+                        <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn btn-primary">
+                            <i class="fas fa-edit"></i> Editar
+                        </a>
+                        <a href="{{ url_for('alunos') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const menuButton = document.querySelector('.menu-button');
+            const menuItems = document.querySelector('.menu-items');
+            
+            if (menuButton) {
+                menuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (menuToggle) {
+                        menuToggle.checked = !menuToggle.checked;
+                    }
+                });
+            }
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+            
+            const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (menuToggle) {
+                        menuToggle.checked = false;
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+            
+            document.addEventListener('click', function(event) {
+                if (!menuItems || !menuToggle) return;
+                
+                const isClickInsideMenu = menuItems.contains(event.target);
+                const isClickOnMenuButton = event.target.closest('.menu-button');
+                
+                if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
+                    menuToggle.checked = false;
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -64,6 +64,9 @@ class Aluno(db.Model):
     email = db.Column(db.String(100))
     data_matricula = db.Column(db.Date, nullable=False, default=datetime.utcnow)
     data_nascimento = db.Column(db.Date)
+    tipo_sanguineo = db.Column(db.String(10))
+    medicamentos = db.Column(db.Text)
+    alergias = db.Column(db.Text)
     status = db.Column(db.String(20), default='Ativo')
     observacoes = db.Column(db.Text)
     turma_id = db.Column(db.Integer, db.ForeignKey('turma.id'))
@@ -119,6 +122,15 @@ class AlunoForm(FlaskForm):
     telefone = StringField('Telefone')
     email = StringField('Email')
     data_nascimento = DateField('Data de Nascimento')
+    tipo_sanguineo = SelectField('Tipo Sanguíneo', choices=[
+        ('', 'Selecione'),
+        ('A+', 'A+'), ('A-', 'A-'),
+        ('B+', 'B+'), ('B-', 'B-'),
+        ('AB+', 'AB+'), ('AB-', 'AB-'),
+        ('O+', 'O+'), ('O-', 'O-')
+    ])
+    medicamentos = TextAreaField('Medicamentos Recorrentes')
+    alergias = TextAreaField('Alergias')
     turma_id = SelectField('Turma', coerce=int)
     observacoes = TextAreaField('Observações')
     submit = SubmitField('Salvar')
@@ -283,6 +295,9 @@ def novo_aluno():
             telefone=form.telefone.data,
             email=form.email.data,
             data_nascimento=form.data_nascimento.data,
+            tipo_sanguineo=form.tipo_sanguineo.data,
+            medicamentos=form.medicamentos.data,
+            alergias=form.alergias.data,
             turma_id=turma_id,
             observacoes=form.observacoes.data
         )
@@ -319,6 +334,9 @@ def editar_aluno(aluno_id):
         aluno.telefone = form.telefone.data
         aluno.email = form.email.data
         aluno.data_nascimento = form.data_nascimento.data
+        aluno.tipo_sanguineo = form.tipo_sanguineo.data
+        aluno.medicamentos = form.medicamentos.data
+        aluno.alergias = form.alergias.data
         aluno.turma_id = nova_turma_id
         aluno.observacoes = form.observacoes.data
         db.session.commit()
@@ -336,6 +354,13 @@ def excluir_aluno(aluno_id):
     db.session.commit()
     flash('Aluno excluído com sucesso!')
     return redirect(url_for('alunos'))
+
+@app.route('/alunos/<int:aluno_id>/visualizar')
+@login_required
+@crud_permission_required('view', 'alunos')
+def visualizar_aluno(aluno_id):
+    aluno = Aluno.query.get_or_404(aluno_id)
+    return render_template('visualizar_aluno.html', aluno=aluno)
 
 # CRUD para Turmas
 @app.route('/turmas')

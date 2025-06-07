@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -8,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
     <style>
-        /* Estilos específicos para a página de alunos */
         .alunos-container {
             padding: 15px;
             margin-bottom: 60px;
@@ -79,6 +79,10 @@
             font-size: 1rem;
         }
         
+        .btn-view {
+            color: #4CAF50;
+        }
+        
         .btn-edit {
             color: #2196F3;
         }
@@ -112,11 +116,52 @@
             margin-bottom: 20px;
         }
         
-        /* Responsividade para tabelas em dispositivos móveis */
+        .alunos-card {
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: white;
+        }
+        
+        .alunos-card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .alunos-card-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .alunos-card-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .alunos-card-info span {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .alunos-card-label {
+            font-weight: 500;
+            color: #666;
+        }
+        
+        .alunos-card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
         @media (max-width: 768px) {
             .alunos-table {
-                display: block;
-                overflow-x: auto;
+                display: none;
             }
             
             .alunos-header {
@@ -129,48 +174,11 @@
                 width: 100%;
                 justify-content: center;
             }
-            
+        }
+
+        @media (min-width: 769px) {
             .alunos-card {
-                margin-bottom: 15px;
-                border: 1px solid #eee;
-                border-radius: 8px;
-                padding: 15px;
-                background-color: white;
-            }
-            
-            .alunos-card-header {
-                display: flex;
-                justify-content: space-between;
-                margin-bottom: 10px;
-            }
-            
-            .alunos-card-name {
-                font-weight: 600;
-                font-size: 1.1rem;
-            }
-            
-            .alunos-card-info {
-                display: flex;
-                flex-direction: column;
-                gap: 5px;
-                margin-bottom: 10px;
-            }
-            
-            .alunos-card-info span {
-                display: flex;
-                justify-content: space-between;
-            }
-            
-            .alunos-card-label {
-                font-weight: 500;
-                color: #666;
-            }
-            
-            .alunos-card-actions {
-                display: flex;
-                justify-content: flex-end;
-                gap: 15px;
-                margin-top: 10px;
+                display: none;
             }
         }
     </style>
@@ -187,21 +195,15 @@
                 <a href="{{ url_for('dashboard') }}" class="menu-item">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
-                {% if current_user.is_admin or current_user.can_manage_alunos %}
                 <a href="{{ url_for('alunos') }}" class="menu-item active">
                     <i class="fas fa-user-graduate"></i> Alunos
                 </a>
-                {% endif %}
-                {% if current_user.is_admin or current_user.can_manage_turmas %}
                 <a href="{{ url_for('turmas') }}" class="menu-item">
                     <i class="fas fa-users"></i> Turmas
                 </a>
-                {% endif %}
-                {% if current_user.is_admin or current_user.can_manage_presencas %}
                 <a href="{{ url_for('presencas') }}" class="menu-item">
                     <i class="fas fa-clipboard-check"></i> Presenças
                 </a>
-                {% endif %}
                 {% if current_user.is_admin %}
                 <a href="{{ url_for('usuarios') }}" class="menu-item">
                     <i class="fas fa-user-cog"></i> Usuários
@@ -253,7 +255,7 @@
 
                 {% if alunos and alunos|length > 0 %}
                 <!-- Visualização para desktop -->
-                <table class="alunos-table d-none d-md-table">
+                <table class="alunos-table">
                     <thead>
                         <tr>
                             <th>Nome</th>
@@ -271,9 +273,10 @@
                             <td>{{ aluno.data_matricula.strftime('%d/%m/%Y') if aluno.data_matricula else '-' }}</td>
                             <td>{{ aluno.status }}</td>
                             <td class="alunos-actions">
-                                <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn-action btn-edit"><i class="fas fa-edit"></i></a>
+                                <a href="{{ url_for('visualizar_aluno', aluno_id=aluno.id) }}" class="btn-action btn-view" title="Visualizar"><i class="fas fa-search"></i></a>
+                                <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn-action btn-edit" title="Editar"><i class="fas fa-edit"></i></a>
                                 <form method="POST" action="{{ url_for('excluir_aluno', aluno_id=aluno.id) }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aluno?')">
-                                    <button type="submit" class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                                    <button type="submit" class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
                                 </form>
                             </td>
                         </tr>
@@ -282,32 +285,31 @@
                 </table>
 
                 <!-- Visualização para mobile -->
-                <div class="d-md-none">
-                    {% for aluno in alunos %}
-                    <div class="alunos-card">
-                        <div class="alunos-card-header">
-                            <div class="alunos-card-name">{{ aluno.nome }}</div>
-                            <div class="alunos-card-status">{{ aluno.status }}</div>
-                        </div>
-                        <div class="alunos-card-info">
-                            <span>
-                                <div class="alunos-card-label">Responsável:</div>
-                                <div>{{ aluno.responsavel }}</div>
-                            </span>
-                            <span>
-                                <div class="alunos-card-label">Data de Matrícula:</div>
-                                <div>{{ aluno.data_matricula.strftime('%d/%m/%Y') if aluno.data_matricula else '-' }}</div>
-                            </span>
-                        </div>
-                        <div class="alunos-card-actions">
-                            <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn-action btn-edit"><i class="fas fa-edit"></i></a>
-                            <form method="POST" action="{{ url_for('excluir_aluno', aluno_id=aluno.id) }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aluno?')">
-                                <button type="submit" class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
-                            </form>
-                        </div>
+                {% for aluno in alunos %}
+                <div class="alunos-card">
+                    <div class="alunos-card-header">
+                        <div class="alunos-card-name">{{ aluno.nome }}</div>
+                        <div class="alunos-card-status">{{ aluno.status }}</div>
                     </div>
-                    {% endfor %}
+                    <div class="alunos-card-info">
+                        <span>
+                            <div class="alunos-card-label">Responsável:</div>
+                            <div>{{ aluno.responsavel }}</div>
+                        </span>
+                        <span>
+                            <div class="alunos-card-label">Data de Matrícula:</div>
+                            <div>{{ aluno.data_matricula.strftime('%d/%m/%Y') if aluno.data_matricula else '-' }}</div>
+                        </span>
+                    </div>
+                    <div class="alunos-card-actions">
+                        <a href="{{ url_for('visualizar_aluno', aluno_id=aluno.id) }}" class="btn-action btn-view" title="Visualizar"><i class="fas fa-search"></i></a>
+                        <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn-action btn-edit" title="Editar"><i class="fas fa-edit"></i></a>
+                        <form method="POST" action="{{ url_for('excluir_aluno', aluno_id=aluno.id) }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aluno?')">
+                            <button type="submit" class="btn-action btn-delete" title="Excluir"><i class="fas fa-trash"></i></button>
+                        </form>
+                    </div>
                 </div>
+                {% endfor %}
                 {% else %}
                 <div class="empty-state">
                     <i class="fas fa-user-graduate"></i>
