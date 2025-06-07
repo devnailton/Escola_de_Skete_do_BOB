@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação - Escolinha de Skate do Bob</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/doc-images.css') }}">
+</head>
+<body>
+    <div class="doc-container">
+        <div class="doc-sidebar">
+            <div class="doc-logo">
+                <img src="{{ url_for('static', filename='images/bob.png') }}" alt="Logo">
+                <span>Escolinha de Skate do Bob</span>
+            </div>
+            
+            <nav class="doc-nav">
+                <a href="{{ url_for('dashboard') }}" class="doc-nav-link">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('documentacao') }}" class="doc-nav-link active">
+                    <i class="fas fa-file-alt"></i> Documentação
+                </a>
+                <a href="{{ url_for('alunos') }}" class="doc-nav-link">
+                    <i class="fas fa-users"></i> Alunos
+                </a>
+                <a href="{{ url_for('turmas') }}" class="doc-nav-link">
+                    <i class="fas fa-chalkboard-teacher"></i> Turmas
+                </a>
+                <a href="{{ url_for('presencas') }}" class="doc-nav-link">
+                    <i class="fas fa-calendar-check"></i> Presenças
+                </a>
+                <a href="{{ url_for('configuracoes') }}" class="doc-nav-link">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+            </nav>
+            
+            <div class="doc-nav-footer">
+                <a href="{{ url_for('index') }}" class="btn-voltar-home">
+                    <i class="fas fa-home"></i> Voltar para Home
+                </a>
+            </div>
+        </div>
+        
+        <div class="doc-content">
+            <div class="doc-header">
+                <h1 class="doc-title">Documentação do Sistema</h1>
+                <div class="doc-user">
+                    <span>Olá, {{ current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}">Sair</a>
+                </div>
+            </div>
+            
+            <a href="{{ url_for('dashboard') }}" class="doc-back">
+                <i class="fas fa-arrow-left"></i> Voltar para o Dashboard
+            </a>
+            
+            <div class="doc-section">
+                <h2 class="doc-section-title" id="visao-geral">Visão Geral</h2>
+                <p>O Sistema de Gestão para Escola de Skate é uma aplicação web desenvolvida para gerenciar todos os aspectos operacionais de uma escola de skate, incluindo alunos, professores, turmas, matrículas e presenças.</p>
+                
+                <p>O sistema foi projetado com uma arquitetura modular, utilizando Django como framework principal, seguindo as melhores práticas de desenvolvimento e segurança.</p>
+                
+                <p>Principais funcionalidades:</p>
+                <ul>
+                    <li>Gestão de usuários com diferentes níveis de acesso</li>
+                    <li>Cadastro e gerenciamento de alunos e responsáveis</li>
+                    <li>Criação e administração de turmas</li>
+                    <li>Controle de matrículas</li>
+                    <li>Registro de presenças</li>
+                    <li>Sistema de mensagens e contato</li>
+                    <li>Feature flags para controle de funcionalidades</li>
+                </ul>
+            </div>
+            
+            <div class="doc-section">
+                <h2 class="doc-section-title" id="modelo-dados">Modelo de Dados</h2>
+                <p>O sistema utiliza o seguinte modelo de dados:</p>
+                
+                <h3>Usuario</h3>
+                <p>Estende o modelo AbstractBaseUser do Django para autenticação personalizada.</p>
+                <ul>
+                    <li><strong>email:</strong> Email único do usuário (usado para login)</li>
+                    <li><strong>papel:</strong> Função do usuário no sistema</li>
+                    <li><strong>ativo:</strong> Status de ativação da conta</li>
+                    <li><strong>criado_em:</strong> Data de criação</li>
+                    <li><strong>atualizado_em:</strong> Data da última atualização</li>
+                </ul>
+                
+                <h3>Pessoa</h3>
+                <p>Armazena informações pessoais dos indivíduos no sistema.</p>
+                <ul>
+                    <li><strong>usuario:</strong> Relação OneToOne com Usuario</li>
+                    <li><strong>nome:</strong> Nome completo</li>
+                    <li><strong>cpf:</strong> CPF</li>
+                    <li><strong>telefone:</strong> Número de telefone</li>
+                    <li><strong>data_nascimento:</strong> Data de nascimento</li>
+                    <li><strong>endereco:</strong> Endereço completo</li>
+                    <li><strong>criado_em:</strong> Data de criação</li>
+                    <li><strong>atualizado_em:</strong> Data da última atualização</li>
+                </ul>
+                
+                <h3>Aluno</h3>
+                <p>Representa um aluno da escola de skate.</p>
+                <ul>
+                    <li><strong>pessoa:</strong> Relação ForeignKey com Pessoa</li>
+                    <li><strong>responsavel:</strong> Relação ForeignKey com Pessoa (responsável)</li>
+                    <li><strong>data_matricula:</strong> Data da primeira matrícula</li>
+                    <li><strong>status:</strong> Status atual do aluno</li>
+                </ul>
+                
+                <h3>Turma</h3>
+                <p>Representa uma turma da escola.</p>
+                <ul>
+                    <li><strong>nome:</strong> Nome da turma</li>
+                    <li><strong>faixa_etaria:</strong> Faixa etária dos alunos</li>
+                    <li><strong>professor:</strong> Relação ForeignKey com Pessoa (professor)</li>
+                    <li><strong>dias_da_semana:</strong> Dias em que ocorrem as aulas</li>
+                    <li><strong>horario_inicio:</strong> Horário de início das aulas</li>
+                    <li><strong>horario_fim:</strong> Horário de término das aulas</li>
+                    <li><strong>local:</strong> Local onde ocorrem as aulas</li>
+                </ul>
+                
+                <div class="doc-image-container">
+                    <img src="{{ url_for('static', filename='images/bob.png') }}" alt="Diagrama de Modelo de Dados" class="doc-image">
+                    <div class="doc-image-caption">Diagrama do Modelo de Dados</div>
+                </div>
+            </div>
+            
+            <div class="doc-section">
+                <h2 class="doc-section-title" id="api">API</h2>
+                <p>O sistema disponibiliza uma API REST para integração com outros sistemas.</p>
+                
+                <h3>Endpoints</h3>
+                <ul>
+                    <li><code>/api/usuarios/</code> - Gerenciamento de usuários</li>
+                    <li><code>/api/pessoas/</code> - Gerenciamento de pessoas</li>
+                    <li><code>/api/alunos/</code> - Gerenciamento de alunos</li>
+                    <li><code>/api/turmas/</code> - Gerenciamento de turmas</li>
+                    <li><code>/api/matriculas/</code> - Gerenciamento de matrículas</li>
+                    <li><code>/api/presencas/</code> - Gerenciamento de presenças</li>
+                </ul>
+                
+                <p>Todos os endpoints suportam operações CRUD (Create, Read, Update, Delete) e utilizam autenticação JWT.</p>
+            </div>
+            
+            <div class="doc-section">
+                <h2 class="doc-section-title" id="fluxos">Fluxos de Acesso</h2>
+                <p>O sistema possui diferentes fluxos de acesso dependendo do papel do usuário:</p>
+                
+                <h3>Administrador</h3>
+                <ul>
+                    <li>Acesso completo a todas as funcionalidades</li>
+                    <li>Gerenciamento de usuários e permissões</li>
+                    <li>Configuração de feature flags</li>
+                    <li>Visualização de relatórios gerenciais</li>
+                </ul>
+                
+                <h3>Professor</h3>
+                <ul>
+                    <li>Visualização das turmas associadas</li>
+                    <li>Registro de presenças</li>
+                    <li>Visualização de alunos matriculados</li>
+                    <li>Envio de mensagens para alunos/responsáveis</li>
+                </ul>
+                
+                <h3>Secretaria</h3>
+                <ul>
+                    <li>Cadastro de alunos e responsáveis</li>
+                    <li>Gerenciamento de matrículas</li>
+                    <li>Visualização de turmas e horários</li>
+                    <li>Recebimento e resposta de mensagens de contato</li>
+                </ul>
+                
+                <div class="doc-image-container">
+                    <img src="{{ url_for('static', filename='images/image.png') }}" alt="Fluxo de Acesso" class="doc-image">
+                    <div class="doc-image-caption">Diagrama de Fluxo de Acesso</div>
+                </div>
+            </div>
+            
+            <div class="doc-section">
+                <h2 class="doc-section-title" id="feature-flags">Feature Flags</h2>
+                <p>O sistema utiliza feature flags para controlar o acesso a funcionalidades específicas:</p>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Flag</th>
+                            <th>Descrição</th>
+                            <th>Papéis com Acesso</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>relatorios_avancados</td>
+                            <td>Acesso a relatórios gerenciais avançados</td>
+                            <td>Administrador</td>
+                        </tr>
+                        <tr>
+                            <td>mensagens_em_massa</td>
+                            <td>Envio de mensagens em massa</td>
+                            <td>Administrador, Secretaria</td>
+                        </tr>
+                        <tr>
+                            <td>exportacao_dados</td>
+                            <td>Exportação de dados em diversos formatos</td>
+                            <td>Administrador, Secretaria</td>
+                        </tr>
+                        <tr>
+                            <td>avaliacao_alunos</td>
+                            <td>Sistema de avaliação de alunos</td>
+                            <td>Administrador, Professor</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="doc-section">
+                <h2 class="doc-section-title" id="estrutura">Estrutura do Projeto</h2>
+                <p>O projeto está organizado em apps Django:</p>
+                
+                <ul>
+                    <li><strong>usuarios</strong> - Gerenciamento de usuários e autenticação</li>
+                    <li><strong>pessoas</strong> - Gerenciamento de pessoas (alunos, professores, responsáveis)</li>
+                    <li><strong>turmas</strong> - Gerenciamento de turmas e matrículas</li>
+                    <li><strong>presencas</strong> - Controle de presenças</li>
+                    <li><strong>mensagens</strong> - Sistema de mensagens e contato</li>
+                    <li><strong>core</strong> - Funcionalidades compartilhadas e configurações</li>
+                </ul>
+                
+                <p>Cada app segue a estrutura padrão do Django:</p>
+                <pre><code>app/
+  ├── migrations/
+  ├── templates/
+  ├── static/
+  ├── __init__.py
+  ├── admin.py
+  ├── apps.py
+  ├── forms.py
+  ├── models.py
+  ├── tests.py
+  ├── urls.py
+  └── views.py</code></pre>
+            </div>
+            
+            <div class="doc-section">
+                <h2 class="doc-section-title" id="seguranca">Segurança</h2>
+                <p>O sistema implementa as seguintes medidas de segurança:</p>
+                
+                <ul>
+                    <li>Autenticação com senha criptografada</li>
+                    <li>Proteção contra CSRF</li>
+                    <li>Validação de entrada de dados</li>
+                    <li>Controle de acesso baseado em papéis</li>
+                    <li>Proteção contra injeção SQL</li>
+                    <li>Proteção contra XSS</li>
+                    <li>Uso de HTTPS</li>
+                </ul>
+            </div>
+            
+            <div class="doc-section">
+                <h2 class="doc-section-title" id="execucao">Execução</h2>
+                <p>Para executar o projeto localmente:</p>
+                
+                <ol>
+                    <li>Clone o repositório</li>
+                    <li>Crie um ambiente virtual: <code>python -m venv venv</code></li>
+                    <li>Ative o ambiente virtual: <code>source venv/bin/activate</code> (Linux/Mac) ou <code>venv\Scripts\activate</code> (Windows)</li>
+                    <li>Instale as dependências: <code>pip install -r requirements.txt</code></li>
+                    <li>Configure as variáveis de ambiente</li>
+                    <li>Execute as migrações: <code>python manage.py migrate</code></li>
+                    <li>Crie um superusuário: <code>python manage.py createsuperuser</code></li>
+                    <li>Inicie o servidor: <code>python manage.py runserver</code></li>
+                </ol>
+                
+                <p>Para implantação em produção, recomenda-se o uso de:</p>
+                <ul>
+                    <li>Gunicorn ou uWSGI como servidor WSGI</li>
+                    <li>Nginx como servidor proxy reverso</li>
+                    <li>PostgreSQL como banco de dados</li>
+                    <li>Redis para cache</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

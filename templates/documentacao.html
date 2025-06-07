@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação - Escolinha de Skate do Bob</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
+    <style>
+        .doc-section {
+            margin-bottom: 2rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .doc-title {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 0.5rem;
+        }
+        
+        .doc-content {
+            font-size: 0.875rem;
+        }
+        
+        .doc-content p {
+            margin-bottom: 1rem;
+        }
+        
+        .doc-content ul, .doc-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .doc-content ul {
+            list-style-type: disc;
+        }
+        
+        .doc-content ol {
+            list-style-type: decimal;
+        }
+        
+        .doc-content li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .doc-content code {
+            background-color: #f3f4f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        
+        .doc-content pre {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+        }
+        
+        .doc-content pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+        
+        .doc-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1rem;
+        }
+        
+        .doc-content th, .doc-content td {
+            border: 1px solid #e5e7eb;
+            padding: 0.5rem;
+            text-align: left;
+        }
+        
+        .doc-content th {
+            background-color: #f9fafb;
+        }
+        
+        .doc-nav {
+            position: sticky;
+            top: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .doc-nav-list {
+            background-color: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .doc-nav-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .doc-nav-link {
+            display: block;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            transition: all 0.3s ease;
+        }
+        
+        .doc-nav-link:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .doc-nav-link.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        @media (min-width: 768px) {
+            .doc-container {
+                display: flex;
+                gap: 2rem;
+            }
+            
+            .doc-sidebar {
+                width: 16rem;
+                flex-shrink: 0;
+            }
+            
+            .doc-main {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="container dashboard-header-content">
+                <div class="dashboard-logo">
+                    <img src="{{ url_for('static', filename='images/bob.png') }}" alt="Logo">
+                    <h1 class="dashboard-title">Documentação do Sistema</h1>
+                </div>
+                
+                <div class="dashboard-user">
+                    <span class="dashboard-user-name">Olá, {{ current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
+                </div>
+            </div>
+        </header>
+        
+        <div class="dashboard-main">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav>
+                    <ul class="sidebar-nav">
+                        <li class="sidebar-nav-item">
+                            <a href="{{ url_for('dashboard') }}" class="sidebar-nav-link">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="{{ url_for('documentacao') }}" class="sidebar-nav-link active">
+                                <i class="fas fa-file-alt"></i> Documentação
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="#" class="sidebar-nav-link">
+                                <i class="fas fa-users"></i> Alunos
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="#" class="sidebar-nav-link">
+                                <i class="fas fa-chalkboard-teacher"></i> Turmas
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="#" class="sidebar-nav-link">
+                                <i class="fas fa-calendar-check"></i> Presenças
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="#" class="sidebar-nav-link">
+                                <i class="fas fa-cog"></i> Configurações
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="{{ url_for('index') }}" class="sidebar-nav-link">
+                                <i class="fas fa-home"></i> Voltar para Home
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="content">
+                <div class="content-header">
+                    <h2 class="content-title">Documentação do Sistema</h2>
+                    <p class="content-subtitle">Guia completo do Sistema de Gestão para Escola de Skate</p>
+                    <a href="{{ url_for('dashboard') }}" class="back-button">
+                        <i class="fas fa-arrow-left"></i> Voltar para o Dashboard
+                    </a>
+                </div>
+                
+                <div class="doc-container">
+                    <div class="doc-sidebar">
+                        <div class="doc-nav">
+                            <ul class="doc-nav-list">
+                                <li class="doc-nav-item">
+                                    <a href="#visao-geral" class="doc-nav-link active">Visão Geral</a>
+                                </li>
+                                <li class="doc-nav-item">
+                                    <a href="#modelo-dados" class="doc-nav-link">Modelo de Dados</a>
+                                </li>
+                                <li class="doc-nav-item">
+                                    <a href="#api" class="doc-nav-link">API</a>
+                                </li>
+                                <li class="doc-nav-item">
+                                    <a href="#fluxos" class="doc-nav-link">Fluxos de Acesso</a>
+                                </li>
+                                <li class="doc-nav-item">
+                                    <a href="#feature-flags" class="doc-nav-link">Feature Flags</a>
+                                </li>
+                                <li class="doc-nav-item">
+                                    <a href="#estrutura" class="doc-nav-link">Estrutura do Projeto</a>
+                                </li>
+                                <li class="doc-nav-item">
+                                    <a href="#seguranca" class="doc-nav-link">Segurança</a>
+                                </li>
+                                <li class="doc-nav-item">
+                                    <a href="#execucao" class="doc-nav-link">Execução</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="doc-main">
+                        <section id="visao-geral" class="doc-section">
+                            <h3 class="doc-title">Visão Geral</h3>
+                            <div class="doc-content">
+                                <p>O Sistema de Gestão para Escola de Skate é uma aplicação web desenvolvida para gerenciar todos os aspectos operacionais de uma escola de skate, incluindo alunos, professores, turmas, matrículas e presenças.</p>
+                                
+                                <p>O sistema foi projetado com uma arquitetura modular, utilizando Django como framework principal, seguindo as melhores práticas de desenvolvimento e segurança.</p>
+                                
+                                <p>Principais funcionalidades:</p>
+                                <ul>
+                                    <li>Gestão de usuários com diferentes níveis de acesso</li>
+                                    <li>Cadastro e gerenciamento de alunos e responsáveis</li>
+                                    <li>Criação e administração de turmas</li>
+                                    <li>Controle de matrículas</li>
+                                    <li>Registro de presenças</li>
+                                    <li>Sistema de mensagens e contato</li>
+                                    <li>Feature flags para controle de funcionalidades</li>
+                                </ul>
+                            </div>
+                        </section>
+                        
+                        <section id="modelo-dados" class="doc-section">
+                            <h3 class="doc-title">Modelo de Dados</h3>
+                            <div class="doc-content">
+                                <p>O sistema utiliza o seguinte modelo de dados:</p>
+                                
+                                <h4>Usuario</h4>
+                                <p>Estende o modelo AbstractBaseUser do Django para autenticação personalizada.</p>
+                                <ul>
+                                    <li><strong>email:</strong> Email único do usuário (usado para login)</li>
+                                    <li><strong>papel:</strong> Função do usuário no sistema</li>
+                                    <li><strong>ativo:</strong> Status de ativação da conta</li>
+                                    <li><strong>criado_em:</strong> Data de criação</li>
+                                    <li><strong>atualizado_em:</strong> Data da última atualização</li>
+                                </ul>
+                                
+                                <h4>Pessoa</h4>
+                                <p>Armazena informações pessoais dos indivíduos no sistema.</p>
+                                <ul>
+                                    <li><strong>usuario:</strong> Relação OneToOne com Usuario</li>
+                                    <li><strong>nome:</strong> Nome completo</li>
+                                    <li><strong>cpf:</strong> CPF</li>
+                                    <li><strong>telefone:</strong> Número de telefone</li>
+                                    <li><strong>data_nascimento:</strong> Data de nascimento</li>
+                                    <li><strong>endereco:</strong> Endereço completo</li>
+                                    <li><strong>criado_em:</strong> Data de criação</li>
+                                    <li><strong>atualizado_em:</strong> Data da última atualização</li>
+                                </ul>
+                                
+                                <h4>Aluno</h4>
+                                <p>Representa um aluno da escola de skate.</p>
+                                <ul>
+                                    <li><strong>pessoa:</strong> Relação ForeignKey com Pessoa</li>
+                                    <li><strong>responsavel:</strong> Relação ForeignKey com Pessoa (responsável)</li>
+                                    <li><strong>data_matricula:</strong> Data da primeira matrícula</li>
+                                    <li><strong>status:</strong> Status atual do aluno</li>
+                                </ul>
+                                
+                                <h4>Turma</h4>
+                                <p>Representa uma turma da escola.</p>
+                                <ul>
+                                    <li><strong>nome:</strong> Nome da turma</li>
+                                    <li><strong>faixa_etaria:</strong> Faixa etária dos alunos</li>
+                                    <li><strong>professor:</strong> Relação ForeignKey com Pessoa (professor)</li>
+                                    <li><strong>dias_da_semana:</strong> Dias em que ocorrem as aulas</li>
+                                    <li><strong>horario_inicio:</strong> Horário de início das aulas</li>
+                                    <li><strong>horario_fim:</strong> Horário de término das aulas</li>
+                                    <li><strong>local:</strong> Local onde ocorrem as aulas</li>
+                                </ul>
+                                
+                                <h4>Matricula</h4>
+                                <p>Representa a matrícula de um aluno em uma turma.</p>
+                                <ul>
+                                    <li><strong>aluno:</strong> Relação ForeignKey com Aluno</li>
+                                    <li><strong>turma:</strong> Relação ForeignKey com Turma</li>
+                                    <li><strong>data_inicio:</strong> Data de início da matrícula</li>
+                                    <li><strong>data_fim:</strong> Data de término da matrícula (opcional)</li>
+                                </ul>
+                                
+                                <h4>Presenca</h4>
+                                <p>Registra a presença de um aluno em uma aula.</p>
+                                <ul>
+                                    <li><strong>matricula:</strong> Relação ForeignKey com Matricula</li>
+                                    <li><strong>data_aula:</strong> Data da aula</li>
+                                    <li><strong>status:</strong> Status da presença (presente, ausente, justificado)</li>
+                                </ul>
+                                
+                                <h4>Funcionalidade</h4>
+                                <p>Controla as feature flags do sistema.</p>
+                                <ul>
+                                    <li><strong>usuario:</strong> Relação ForeignKey com Usuario</li>
+                                    <li><strong>papel:</strong> Papel do usuário</li>
+                                    <li><strong>flag:</strong> Nome da funcionalidade</li>
+                                    <li><strong>habilitado:</strong> Status de ativação</li>
+                                    <li><strong>criado_em:</strong> Data de criação</li>
+                                </ul>
+                                
+                                <h4>MensagemContato</h4>
+                                <p>Armazena mensagens enviadas pelo formulário de contato.</p>
+                                <ul>
+                                    <li><strong>nome:</strong> Nome do remetente</li>
+                                    <li><strong>email:</strong> Email do remetente</li>
+                                    <li><strong>mensagem:</strong> Conteúdo da mensagem</li>
+                                    <li><strong>enviada_em:</strong> Data de envio</li>
+                                </ul>
+                                
+                                <h4>MensagemAutorizada</h4>
+                                <p>Controla o acesso às mensagens de contato.</p>
+                                <ul>
+                                    <li><strong>mensagem:</strong> Relação ForeignKey com MensagemContato</li>
+                                    <li><strong>usuario:</strong> Relação ForeignKey com Usuario</li>
+                                    <li><strong>visualizada:</strong> Status de visualização</li>
+                                </ul>
+                            </div>
+                        </section>
+                        
+                        <section id="api" class="doc-section">
+                            <h3 class="doc-title">API</h3>
+                            <div class="doc-content">
+                                <p>O sistema disponibiliza uma API RESTful para integração com outros sistemas. Todos os endpoints requerem autenticação via token JWT.</p>
+                                
+                                <h4>Endpoints de Usuários</h4>
+                                <ul>
+                                    <li><code>GET /api/usuarios/</code> - Lista todos os usuários</li>
+                                    <li><code>POST /api/usuarios/</code> - Cria um novo usuário</li>
+                                    <li><code>GET /api/usuarios/{id}/</code> - Obtém detalhes de um usuário</li>
+                                    <li><code>PUT /api/usuarios/{id}/</code> - Atualiza um usuário</li>
+                                    <li><code>DELETE /api/usuarios/{id}/</code> - Remove um usuário</li>
+                                </ul>
+                                
+                                <h4>Endpoints de Alunos</h4>
+                                <ul>
+                                    <li><code>GET /api/alunos/</code> - Lista todos os alunos</li>
+                                    <li><code>POST /api/alunos/</code> - Cria um novo aluno</li>
+                                    <li><code>GET /api/alunos/{id}/</code> - Obtém detalhes de um aluno</li>
+                                    <li><code>PUT /api/alunos/{id}/</code> - Atualiza um aluno</li>
+                                    <li><code>DELETE /api/alunos/{id}/</code> - Remove um aluno</li>
+                                </ul>
+                                
+                                <h4>Endpoints de Turmas</h4>
+                                <ul>
+                                    <li><code>GET /api/turmas/</code> - Lista todas as turmas</li>
+                                    <li><code>POST /api/turmas/</code> - Cria uma nova turma</li>
+                                    <li><code>GET /api/turmas/{id}/</code> - Obtém detalhes de uma turma</li>
+                                    <li><code>PUT /api/turmas/{id}/</code> - Atualiza uma turma</li>
+                                    <li><code>DELETE /api/turmas/{id}/</code> - Remove uma turma</li>
+                                    <li><code>GET /api/turmas/{id}/alunos/</code> - Lista alunos de uma turma</li>
+                                </ul>
+                                
+                                <h4>Endpoints de Matrículas</h4>
+                                <ul>
+                                    <li><code>GET /api/matriculas/</code> - Lista todas as matrículas</li>
+                                    <li><code>POST /api/matriculas/</code> - Cria uma nova matrícula</li>
+                                    <li><code>GET /api/matriculas/{id}/</code> - Obtém detalhes de uma matrícula</li>
+                                    <li><code>PUT /api/matriculas/{id}/</code> - Atualiza uma matrícula</li>
+                                    <li><code>DELETE /api/matriculas/{id}/</code> - Remove uma matrícula</li>
+                                </ul>
+                                
+                                <h4>Endpoints de Presenças</h4>
+                                <ul>
+                                    <li><code>GET /api/presencas/</code> - Lista todas as presenças</li>
+                                    <li><code>POST /api/presencas/</code> - Registra uma nova presença</li>
+                                    <li><code>GET /api/presencas/{id}/</code> - Obtém detalhes de uma presença</li>
+                                    <li><code>PUT /api/presencas/{id}/</code> - Atualiza uma presença</li>
+                                    <li><code>DELETE /api/presencas/{id}/</code> - Remove uma presença</li>
+                                    <li><code>GET /api/presencas/turma/{turma_id}/data/{data}/</code> - Lista presenças de uma turma em uma data</li>
+                                </ul>
+                                
+                                <h4>Endpoints de Mensagens</h4>
+                                <ul>
+                                    <li><code>GET /api/mensagens/</code> - Lista todas as mensagens</li>
+                                    <li><code>POST /api/mensagens/</code> - Envia uma nova mensagem</li>
+                                    <li><code>GET /api/mensagens/{id}/</code> - Obtém detalhes de uma mensagem</li>
+                                    <li><code>PUT /api/mensagens/{id}/visualizar/</code> - Marca uma mensagem como visualizada</li>
+                                    <li><code>PUT /api/mensagens/{id}/responder/</code> - Marca uma mensagem como respondida</li>
+                                </ul>
+                            </div>
+                        </section>
+                        
+                        <section id="fluxos" class="doc-section">
+                            <h3 class="doc-title">Fluxos de Acesso</h3>
+                            <div class="doc-content">
+                                <p>O sistema possui diferentes fluxos de acesso baseados no papel do usuário:</p>
+                                
+                                <h4>Administrador</h4>
+                                <p>Acesso completo a todas as funcionalidades do sistema:</p>
+                                <ul>
+                                    <li>Gerenciamento de usuários</li>
+                                    <li>Gerenciamento de alunos e responsáveis</li>
+                                    <li>Gerenciamento de turmas</li>
+                                    <li>Gerenciamento de matrículas</li>
+                                    <li>Registro e consulta de presenças</li>
+                                    <li>Configuração de feature flags</li>
+                                    <li>Acesso a todas as mensagens de contato</li>
+                                    <li>Geração de relatórios</li>
+                                </ul>
+                                
+                                <h4>Professor</h4>
+                                <p>Acesso limitado às suas turmas e alunos:</p>
+                                <ul>
+                                    <li>Visualização das suas turmas</li>
+                                    <li>Visualização dos alunos das suas turmas</li>
+                                    <li>Registro e consulta de presenças das suas turmas</li>
+                                    <li>Visualização de informações básicas dos alunos</li>
+                                </ul>
+                                
+                                <h4>Aluno/Responsável</h4>
+                                <p>Acesso limitado às suas próprias informações:</p>
+                                <ul>
+                                    <li>Visualização das suas matrículas</li>
+                                    <li>Visualização das suas turmas</li>
+                                    <li>Visualização do seu histórico de presenças</li>
+                                    <li>Atualização de informações pessoais</li>
+                                    <li>Envio de mensagens</li>
+                                </ul>
+                                
+                                <h4>Visitante</h4>
+                                <p>Acesso apenas à área pública do site:</p>
+                                <ul>
+                                    <li>Visualização da landing page</li>
+                                    <li>Envio de mensagens pelo formulário de contato</li>
+                                </ul>
+                            </div>
+                        </section>
+                        
+                        <section id="feature-flags" class="doc-section">
+                            <h3 class="doc-title">Feature Flags</h3>
+                            <div class="doc-content">
+                                <p>O sistema utiliza feature flags para controlar o acesso a funcionalidades específicas. As flags são configuradas por usuário e papel.</p>
+                                
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Flag</th>
+                                            <th>Descrição</th>
+                                            <th>Papéis Padrão</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>relatorios_avancados</td>
+                                            <td>Acesso a relatórios avançados e estatísticas</td>
+                                            <td>Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td>gerenciamento_usuarios</td>
+                                            <td>Criação e edição de usuários</td>
+                                            <td>Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td>gerenciamento_turmas</td>
+                                            <td>Criação e edição de turmas</td>
+                                            <td>Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td>registro_presencas</td>
+                                            <td>Registro de presenças</td>
+                                            <td>Administrador, Professor</td>
+                                        </tr>
+                                        <tr>
+                                            <td>mensagens_contato</td>
+                                            <td>Acesso às mensagens de contato</td>
+                                            <td>Administrador</td>
+                                        </tr>
+                                        <tr>
+                                            <td>area_aluno</td>
+                                            <td>Acesso à área do aluno</td>
+                                            <td>Aluno, Responsável</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                        
+                        <section id="estrutura" class="doc-section">
+                            <h3 class="doc-title">Estrutura do Projeto</h3>
+                            <div class="doc-content">
+                                <p>O projeto está organizado em apps Django, seguindo o princípio de separação de responsabilidades:</p>
+                                
+                                <pre><code>skate_project/
+├── manage.py
+├── skate_project/
+│   ├── __init__.py
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── usuarios/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   └── urls.py
+├── pessoas/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   └── urls.py
+├── alunos/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   └── urls.py
+├── turmas/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   └── urls.py
+├── matriculas/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   └── urls.py
+├── presencas/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   └── urls.py
+├── mensagens/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   └── urls.py
+├── feature_flags/
+│   ├── __init__.py
+│   ├── admin.py
+│   ├── models.py
+│   ├── serializers.py
+│   ├── views.py
+│   └── urls.py
+└── static/
+    ├── css/
+    ├── js/
+    └── images/</code></pre>
+                            </div>
+                        </section>
+                        
+                        <section id="seguranca" class="doc-section">
+                            <h3 class="doc-title">Segurança</h3>
+                            <div class="doc-content">
+                                <p>O sistema implementa as seguintes medidas de segurança:</p>
+                                
+                                <ul>
+                                    <li><strong>Autenticação:</strong> Sistema de login seguro com senhas hash</li>
+                                    <li><strong>Autorização:</strong> Controle de acesso baseado em papéis e feature flags</li>
+                                    <li><strong>Proteção CSRF:</strong> Tokens CSRF em todos os formulários</li>
+                                    <li><strong>Proteção XSS:</strong> Escape automático de conteúdo em templates</li>
+                                    <li><strong>Proteção SQL Injection:</strong> Uso do ORM Django para consultas seguras</li>
+                                    <li><strong>HTTPS:</strong> Recomendado para produção</li>
+                                    <li><strong>Rate Limiting:</strong> Limitação de requisições para prevenir ataques de força bruta</li>
+                                    <li><strong>Validação de Dados:</strong> Validação rigorosa de todos os inputs</li>
+                                </ul>
+                            </div>
+                        </section>
+                        
+                        <section id="execucao" class="doc-section">
+                            <h3 class="doc-title">Execução</h3>
+                            <div class="doc-content">
+                                <p>Para executar o sistema em ambiente de desenvolvimento:</p>
+                                
+                                <ol>
+                                    <li>Clone o repositório</li>
+                                    <li>Crie e ative um ambiente virtual Python</li>
+                                    <li>Instale as dependências: <code>pip install -r requirements.txt</code></li>
+                                    <li>Configure o banco de dados: <code>python manage.py migrate</code></li>
+                                    <li>Crie um superusuário: <code>python manage.py createsuperuser</code></li>
+                                    <li>Execute o servidor: <code>python manage.py runserver</code></li>
+                                </ol>
+                                
+                                <p>Para ambiente de produção, recomenda-se:</p>
+                                
+                                <ul>
+                                    <li>Usar Gunicorn ou uWSGI como servidor WSGI</li>
+                                    <li>Configurar Nginx como proxy reverso</li>
+                                    <li>Usar PostgreSQL como banco de dados</li>
+                                    <li>Configurar HTTPS com certificado SSL</li>
+                                    <li>Implementar backup regular do banco de dados</li>
+                                </ul>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Sidebar Toggle Button for Mobile -->
+    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                
+                // Change icon based on sidebar state
+                const icon = sidebarToggle.querySelector('i');
+                if (sidebar.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const isClickInsideSidebar = sidebar.contains(event.target);
+                const isClickOnToggle = sidebarToggle.contains(event.target);
+                
+                if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    const icon = sidebarToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Smooth scrolling for documentation links
+            document.querySelectorAll('.doc-nav-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    document.querySelectorAll('.doc-nav-link').forEach(l => {
+                        l.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Scroll to section
+                    const targetId = this.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

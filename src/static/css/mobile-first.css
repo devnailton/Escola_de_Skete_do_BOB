@@ -1,0 +1,272 @@
+/* Mobile First CSS */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #FF9F1C;
+    --secondary-color: #2196F3;
+    --dark-color: #333;
+    --light-color: #f4f4f4;
+    --danger-color: #F44336;
+    --success-color: #4CAF50;
+    --warning-color: #FF9800;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Fredoka', sans-serif;
+    background-color: #f9f9f9;
+    color: var(--dark-color);
+    line-height: 1.6;
+}
+
+/* Container principal com largura máxima para mobile first */
+.mobile-container {
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Menu Hamburguer */
+.menu-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+}
+
+#menu-toggle {
+    display: none;
+}
+
+.menu-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.menu-icon {
+    position: relative;
+    width: 20px;
+    height: 2px;
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+.menu-icon::before,
+.menu-icon::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 2px;
+    background-color: white;
+    transition: all 0.3s ease;
+}
+
+.menu-icon::before {
+    transform: translateY(-6px);
+}
+
+.menu-icon::after {
+    transform: translateY(6px);
+}
+
+#menu-toggle:checked + .menu-button .menu-icon {
+    background-color: transparent;
+}
+
+#menu-toggle:checked + .menu-button .menu-icon::before {
+    transform: rotate(45deg);
+}
+
+#menu-toggle:checked + .menu-button .menu-icon::after {
+    transform: rotate(-45deg);
+}
+
+.menu-items {
+    position: fixed;
+    top: 0;
+    left: -250px;
+    width: 250px;
+    height: 100vh;
+    background-color: white;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    transition: left 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+#menu-toggle:checked ~ .menu-items {
+    left: 0;
+}
+
+.menu-item {
+    padding: 15px 20px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: var(--dark-color);
+    border-bottom: 1px solid #f1f1f1;
+    transition: background-color 0.3s ease;
+}
+
+.menu-item i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+    color: var(--primary-color);
+}
+
+.menu-item.active {
+    background-color: #f9f9f9;
+    font-weight: 500;
+    border-left: 4px solid var(--primary-color);
+}
+
+.menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.menu-footer {
+    margin-top: auto;
+    padding: 15px;
+    border-top: 1px solid #f1f1f1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-voltar-home,
+.btn-logout {
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.btn-voltar-home {
+    background-color: var(--light-color);
+    color: var(--dark-color);
+}
+
+.btn-logout {
+    background-color: #f5f5f5;
+    color: var(--danger-color);
+}
+
+/* Conteúdo Principal */
+.main-content {
+    padding-top: 60px;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.dashboard-header {
+    background-color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 900;
+}
+
+.dashboard-header h1 {
+    font-size: 1.2rem;
+    margin-left: 60px;
+}
+
+.user-info {
+    font-size: 0.9rem;
+    color: #666;
+}
+
+/* Utilitários */
+.d-none {
+    display: none;
+}
+
+/* Media queries para responsividade */
+@media (min-width: 768px) {
+    .dashboard-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .d-md-none {
+        display: none;
+    }
+    
+    .d-none.d-md-table {
+        display: table;
+    }
+    
+    .d-none.d-md-block {
+        display: block;
+    }
+    
+    .d-none.d-md-flex {
+        display: flex;
+    }
+}
+
+@media (min-width: 992px) {
+    .menu-button {
+        display: none;
+    }
+    
+    .menu-items {
+        left: 0;
+        width: 220px;
+        box-shadow: none;
+        border-right: 1px solid #f1f1f1;
+    }
+    
+    .main-content {
+        margin-left: 220px;
+        width: calc(100% - 220px);
+    }
+    
+    .dashboard-header {
+        width: calc(100% - 220px);
+        left: 220px;
+    }
+    
+    .dashboard-header h1 {
+        margin-left: 20px;
+    }
+}
+
+/* Animações */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Escolinha de Skate do Bob</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
+    <style>
+        /* Estilos específicos para o dashboard */
+        .dashboard-container {
+            padding: 15px;
+            margin-bottom: 60px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--dark-color);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .dashboard-section {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .section-header {
+            background-color: #f5f5f5;
+            padding: 15px;
+            font-weight: 600;
+            color: var(--dark-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-header i {
+            margin-right: 10px;
+            color: var(--primary-color);
+        }
+        
+        .section-content {
+            padding: 15px;
+        }
+        
+        .activity-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+        
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            color: var(--primary-color);
+        }
+        
+        .activity-content {
+            flex: 1;
+        }
+        
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .activity-time {
+            font-size: 0.8rem;
+            color: #999;
+        }
+        
+        .event-item {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .event-item:last-child {
+            border-bottom: none;
+        }
+        
+        .event-date {
+            width: 60px;
+            text-align: center;
+            margin-right: 15px;
+        }
+        
+        .event-day {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .event-month {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+        }
+        
+        .event-content {
+            flex: 1;
+        }
+        
+        .event-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .event-details {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+        
+        .event-details i {
+            margin-right: 5px;
+            font-size: 0.8rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
+        
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+        
+        /* Responsividade para tablets e desktop */
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .dashboard-flex {
+                display: flex;
+                gap: 20px;
+            }
+            
+            .dashboard-flex > div {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Menu Hamburguer -->
+        <div class="menu-container">
+            <input type="checkbox" id="menu-toggle">
+            <label for="menu-toggle" class="menu-button">
+                <span class="menu-icon"></span>
+            </label>
+            <div class="menu-items">
+                <a href="{{ url_for('dashboard') }}" class="menu-item active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('alunos') }}" class="menu-item">
+                    <i class="fas fa-user-graduate"></i> Alunos
+                </a>
+                <a href="{{ url_for('turmas') }}" class="menu-item">
+                    <i class="fas fa-users"></i> Turmas
+                </a>
+                <a href="{{ url_for('presencas') }}" class="menu-item">
+                    <i class="fas fa-clipboard-check"></i> Presenças
+                </a>
+                <a href="{{ url_for('documentacao') }}" class="menu-item">
+                    <i class="fas fa-book"></i> Documentação
+                </a>
+                <a href="{{ url_for('configuracoes') }}" class="menu-item">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+                <div class="menu-footer">
+                    <a href="{{ url_for('index') }}" class="btn-voltar-home">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <header class="dashboard-header">
+                <h1>Dashboard</h1>
+                <div class="user-info">
+                    <span>Olá, {{ current_user.username }}</span>
+                </div>
+            </header>
+
+            <div class="dashboard-container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-graduate"></i>
+                        </div>
+                        <div class="stat-value">{{ alunos_count }}</div>
+                        <div class="stat-label">Alunos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-value">{{ turmas_count }}</div>
+                        <div class="stat-label">Turmas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div class="stat-value">{{ professores_count }}</div>
+                        <div class="stat-label">Professores</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-value">{{ eventos_count }}</div>
+                        <div class="stat-label">Eventos</div>
+                    </div>
+                </div>
+
+                <div class="dashboard-flex d-md-flex">
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <span><i class="fas fa-history"></i> Atividades Recentes</span>
+                        </div>
+                        <div class="section-content">
+                            {% if atividades and atividades|length > 0 %}
+                                {% for atividade in atividades %}
+                                <div class="activity-item">
+                                    <div class="activity-icon">
+                                        <i class="{{ atividade.icon }}"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">{{ atividade.titulo }}</div>
+                                        <div class="activity-time">{{ atividade.tempo }}</div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-history"></i>
+                                    <p>Nenhuma atividade recente</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <span><i class="fas fa-calendar-alt"></i> Próximos Eventos</span>
+                        </div>
+                        <div class="section-content">
+                            {% if eventos and eventos|length > 0 %}
+                                {% for evento in eventos %}
+                                <div class="event-item">
+                                    <div class="event-date">
+                                        <div class="event-day">{{ evento.dia }}</div>
+                                        <div class="event-month">{{ evento.mes }}</div>
+                                    </div>
+                                    <div class="event-content">
+                                        <div class="event-title">{{ evento.titulo }}</div>
+                                        <div class="event-details">
+                                            <i class="fas fa-map-marker-alt"></i> {{ evento.local }}
+                                        </div>
+                                        <div class="event-details">
+                                            <i class="fas fa-clock"></i> {{ evento.horario }}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="empty-state">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    <p>Nenhum evento programado</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script para controle do menu hamburguer
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const menuItems = document.querySelector('.menu-items');
+            
+            // Fecha o menu quando um item é clicado
+            const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    menuToggle.checked = false;
+                });
+            });
+            
+            // Fecha o menu quando clicar fora dele
+            document.addEventListener('click', function(event) {
+                const isClickInsideMenu = menuItems.contains(event.target);
+                const isClickOnMenuButton = event.target.closest('.menu-button');
+                
+                if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
+                    menuToggle.checked = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
