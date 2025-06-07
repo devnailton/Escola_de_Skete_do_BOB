@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escolinha de Skate do Bob</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-content">
+                <div class="navbar-logo">
+                    <img src="{{ url_for('static', filename='images/bob.png') }}" alt="Logo" class="logo-img">
+                    <span class="logo-text">Escolinha de Skate do Bob</span>
+                </div>
+                
+                <button id="menu-toggle" class="menu-toggle" aria-label="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="navbar-menu" id="mobile-menu">
+                    <a href="#home" class="nav-link">Início</a>
+                    <a href="#about" class="nav-link">Sobre</a>
+                    <a href="#classes" class="nav-link">Aulas</a>
+                    <a href="#events" class="nav-link">Eventos</a>
+                    <a href="#contact" class="nav-link">Contato</a>
+                    <a href="{{ url_for('login') }}" class="nav-link login-btn">Login</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero-section">
+        <div class="container">
+            <div class="hero-content">
+                <div class="hero-text">
+                    <h1 class="hero-title">Escolinha de Skate <span>do Bob</span></h1>
+                    <p class="hero-description">
+                        Transformando vidas através do skate. Aprenda, evolua e faça parte da nossa comunidade!
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="#classes" class="btn btn-primary">Comece Agora</a>
+                        <a href="#about" class="btn btn-outline">Conheça Mais</a>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <img src="{{ url_for('static', filename='images/image.png') }}" alt="Skatista ilustrativo" class="animate-float">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Sobre Nós</h2>
+                <div class="section-divider"></div>
+                <p class="section-description">
+                    A Escolinha de Skate do Bob é uma ONG dedicada a ensinar skate para crianças e jovens, promovendo esporte, cultura e inclusão social.
+                </p>
+            </div>
+            
+            <div class="about-content">
+                <div class="about-image">
+                    <img src="{{ url_for('static', filename='images/bob2.png') }}" alt="Sobre nós" class="img-responsive">
+                </div>
+                <div class="about-text">
+                    <h3 class="about-subtitle">Nossa História</h3>
+                    <p class="about-description">
+                        Fundada em 2010 por Roberto "Bob" Silva, a escolinha começou como um projeto pequeno na garagem de sua casa. Hoje, atendemos mais de 200 alunos por mês em nossa sede própria.
+                    </p>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4 class="feature-title">Missão</h4>
+                            <p class="feature-description">
+                                Promover o desenvolvimento pessoal e social através do skateboarding, oferecendo aulas gratuitas e de qualidade.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-eye"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4 class="feature-title">Visão</h4>
+                            <p class="feature-description">
+                                Ser referência nacional em projetos sociais que utilizam o skate como ferramenta de transformação.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                        <div class="feature-text">
+                            <h4 class="feature-title">Valores</h4>
+                            <p class="feature-description">
+                                Respeito, inclusão, perseverança, diversão e amor pelo skate.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <a href="#contact" class="btn btn-dark">Seja um Voluntário</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="classes" class="classes-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nossas Aulas</h2>
+                <div class="section-divider"></div>
+                <p class="section-description">
+                    Oferecemos aulas para todas as idades e níveis, desde iniciantes até avançados. Nossos instrutores são experientes e apaixonados pelo skate.
+                </p>
+            </div>
+            
+            <div class="classes-grid">
+                <div class="class-card">
+                    <div class="class-icon">
+                        <i class="fas fa-child"></i>
+                    </div>
+                    <div class="class-content">
+                        <h3 class="class-title">Iniciantes</h3>
+                        <p class="class-description">
+                            Aulas básicas para quem está começando no mundo do skate. Aprenda o equilíbrio, posicionamento e primeiras manobras.
+                        </p>
+                        <ul class="class-features">
+                            <li><i class="fas fa-check"></i> Segurança primeiro</li>
+                            <li><i class="fas fa-check"></i> Equipamentos inclusos</li>
+                            <li><i class="fas fa-check"></i> Turmas pequenas</li>
+                        </ul>
+                        <div class="class-price">Grátis</div>
+                        <a href="#contact" class="btn btn-primary btn-block">Inscreva-se</a>
+                    </div>
+                </div>
+                
+                <div class="class-card">
+                    <div class="class-icon class-icon-alt">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="class-content">
+                        <h3 class="class-title">Intermediário</h3>
+                        <p class="class-description">
+                            Para quem já domina o básico e quer evoluir suas manobras. Aprenda ollies, flips, grinds e muito mais.
+                        </p>
+                        <ul class="class-features">
+                            <li><i class="fas fa-check"></i> Técnicas avançadas</li>
+                            <li><i class="fas fa-check"></i> Video análise</li>
+                            <li><i class="fas fa-check"></i> Acompanhamento personalizado</li>
+                        </ul>
+                        <div class="class-price">Grátis</div>
+                        <a href="#contact" class="btn btn-dark btn-block">Inscreva-se</a>
+                    </div>
+                </div>
+                
+                <div class="class-card">
+                    <div class="class-icon">
+                        <i class="fas fa-trophy"></i>
+                    </div>
+                    <div class="class-content">
+                        <h3 class="class-title">Avançado</h3>
+                        <p class="class-description">
+                            Para skatistas experientes que querem competir ou se profissionalizar. Treinos intensivos e preparação física.
+                        </p>
+                        <ul class="class-features">
+                            <li><i class="fas fa-check"></i> Treino de competição</li>
+                            <li><i class="fas fa-check"></i> Preparação física</li>
+                            <li><i class="fas fa-check"></i> Mentoria profissional</li>
+                        </ul>
+                        <div class="class-price">Grátis</div>
+                        <a href="#contact" class="btn btn-primary btn-block">Inscreva-se</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="events" class="events-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Próximos Eventos</h2>
+                <div class="section-divider"></div>
+                <p class="section-description">
+                    Participe dos nossos eventos e competições. Uma oportunidade para mostrar suas habilidades e conhecer outros skatistas.
+                </p>
+            </div>
+            
+            <div class="events-grid">
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="event-day">28</span>
+                        <span class="event-month">Mai</span>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Campeonato Interno</h3>
+                        <p class="event-description">
+                            Competição entre alunos de todas as turmas com premiação para os melhores colocados.
+                        </p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Pista Principal</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>14:00 - 18:00</span>
+                            </div>
+                        </div>
+                        <a href="#contact" class="btn btn-outline btn-sm">Saiba Mais</a>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="event-day">05</span>
+                        <span class="event-month">Jun</span>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Workshop de Manobras</h3>
+                        <p class="event-description">
+                            Workshop com skatista profissional convidado, ensinando técnicas avançadas.
+                        </p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Pista Coberta</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>10:00 - 12:00</span>
+                            </div>
+                        </div>
+                        <a href="#contact" class="btn btn-outline btn-sm">Saiba Mais</a>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="event-day">12</span>
+                        <span class="event-month">Jun</span>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Dia da Família no Skate</h3>
+                        <p class="event-description">
+                            Traga sua família para conhecer a escolinha e experimentar o skate em um dia especial.
+                        </p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Área de Convivência</span>
+                            </div>
+                            <div class="event-detail">
+                                <i class="fas fa-clock"></i>
+                                <span>09:00 - 17:00</span>
+                            </div>
+                        </div>
+                        <a href="#contact" class="btn btn-outline btn-sm">Saiba Mais</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Entre em Contato</h2>
+                <div class="section-divider"></div>
+                <p class="section-description">
+                    Tem interesse em participar das aulas ou ser voluntário? Entre em contato conosco!
+                </p>
+            </div>
+            
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>Endereço</h4>
+                            <p>Rua das Manobras, 123<br>Bairro Radical, São Paulo - SP</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>Telefone</h4>
+                            <p>(11) 99999-8888</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>Email</h4>
+                            <p>contato@escolinhadoskate.com.br</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <div class="contact-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="contact-text">
+                            <h4>Horário de Funcionamento</h4>
+                            <p>Segunda a Sexta: 9h às 18h<br>Sábado: 9h às 14h</p>
+                        </div>
+                    </div>
+                    
+                    <div class="social-links">
+                        <a href="https://instagram.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://facebook.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://youtube.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://twitter.com/skatedobob" class="social-link" target="_blank" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <form action="{{ url_for('contact') }}" method="POST">
+                        <div class="form-group">
+                            <label for="name">Nome</label>
+                            <input type="text" id="name" name="name" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Assunto</label>
+                            <input type="text" id="subject" name="subject" required class="form-control">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Mensagem</label>
+                            <textarea id="message" name="message" rows="5" required class="form-control"></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary btn-block">Enviar Mensagem</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="{{ url_for('static', filename='images/bob.png') }}" alt="Logo" class="footer-logo-img">
+                    <div class="footer-logo-text">
+                        <h3>Escolinha de Skate do Bob</h3>
+                        <p>Transformando vidas através do skate desde 2010</p>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Links Rápidos</h4>
+                    <ul>
+                        <li><a href="#home">Início</a></li>
+                        <li><a href="#about">Sobre</a></li>
+                        <li><a href="#classes">Aulas</a></li>
+                        <li><a href="#events">Eventos</a></li>
+                        <li><a href="#contact">Contato</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-social">
+                    <h4>Siga-nos</h4>
+                    <div class="social-links">
+                        <a href="https://instagram.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="https://facebook.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="Facebook">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="https://youtube.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="https://twitter.com/skatedobob" class="social-link" target="_blank" aria-label="Twitter">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Escolinha de Skate do Bob. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+            
+            menuToggle.addEventListener('click', function() {
+                mobileMenu.classList.toggle('active');
+                menuToggle.classList.toggle('active');
+            });
+            
+            // Close menu when clicking on a link
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                });
+            });
+            
+            // Smooth scrolling
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+                    
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 60,
+                            behavior: 'smooth'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

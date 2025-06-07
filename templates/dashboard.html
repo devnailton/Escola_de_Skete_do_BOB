@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Escolinha de Skate do Bob</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="container dashboard-header-content">
+                <div class="dashboard-logo">
+                    <img src="{{ url_for('static', filename='images/bob.png') }}" alt="Logo">
+                    <h1 class="dashboard-title">Painel Administrativo</h1>
+                </div>
+                
+                <div class="dashboard-user">
+                    <span class="dashboard-user-name">Olá, {{ current_user.username }}</span>
+                    <a href="{{ url_for('logout') }}" class="logout-btn">Sair</a>
+                </div>
+            </div>
+        </header>
+        
+        <div class="dashboard-main">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav>
+                    <ul class="sidebar-nav">
+                        <li class="sidebar-nav-item">
+                            <a href="{{ url_for('dashboard') }}" class="sidebar-nav-link active">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="{{ url_for('documentacao') }}" class="sidebar-nav-link">
+                                <i class="fas fa-file-alt"></i> Documentação
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="#" class="sidebar-nav-link">
+                                <i class="fas fa-users"></i> Alunos
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="#" class="sidebar-nav-link">
+                                <i class="fas fa-chalkboard-teacher"></i> Turmas
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="#" class="sidebar-nav-link">
+                                <i class="fas fa-calendar-check"></i> Presenças
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="#" class="sidebar-nav-link">
+                                <i class="fas fa-cog"></i> Configurações
+                            </a>
+                        </li>
+                        <li class="sidebar-nav-item">
+                            <a href="{{ url_for('index') }}" class="sidebar-nav-link">
+                                <i class="fas fa-home"></i> Voltar para Home
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="content">
+                <div class="content-header">
+                    <h2 class="content-title">Dashboard</h2>
+                    <p class="content-subtitle">Bem-vindo ao painel administrativo da Escolinha de Skate do Bob</p>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3 class="stat-title">Total de Alunos</h3>
+                            <div class="stat-icon" style="background-color: #dbeafe; color: #1e40af;">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                        <p class="stat-value">{{ alunos_count|default(0) }}</p>
+                        {% if alunos_change %}
+                        <p class="stat-change">
+                            <i class="fas fa-arrow-up"></i> {{ alunos_change }}% desde o mês passado
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3 class="stat-title">Turmas Ativas</h3>
+                            <div class="stat-icon" style="background-color: #dcfce7; color: #166534;">
+                                <i class="fas fa-chalkboard-teacher"></i>
+                            </div>
+                        </div>
+                        <p class="stat-value">{{ turmas_count|default(0) }}</p>
+                        {% if turmas_novas %}
+                        <p class="stat-change">
+                            <i class="fas fa-arrow-up"></i> {{ turmas_novas }} novas turmas
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3 class="stat-title">Professores</h3>
+                            <div class="stat-icon" style="background-color: #f3e8ff; color: #7e22ce;">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                        </div>
+                        <p class="stat-value">{{ professores_count|default(0) }}</p>
+                        {% if professores_change %}
+                        <p class="stat-change" style="color: #6b7280;">
+                            <i class="fas fa-equals"></i> {{ professores_change }}
+                        </p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <h3 class="stat-title">Eventos</h3>
+                            <div class="stat-icon" style="background-color: #ffedd5; color: #c2410c;">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                        </div>
+                        <p class="stat-value">{{ eventos_count|default(0) }}</p>
+                        {% if proximo_evento %}
+                        <p class="stat-change" style="color: #f97316;">
+                            <i class="fas fa-clock"></i> Próximo em {{ proximo_evento }} dias
+                        </p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Atividade Recente</h3>
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Aluno</th>
+                                    <th>Turma</th>
+                                    <th>Atividade</th>
+                                    <th>Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if atividades %}
+                                    {% for atividade in atividades %}
+                                    <tr>
+                                        <td>{{ atividade.aluno }}</td>
+                                        <td>{{ atividade.turma }}</td>
+                                        <td>{{ atividade.tipo }}</td>
+                                        <td>{{ atividade.data }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="empty-state">
+                                            <div>
+                                                <i class="fas fa-info-circle"></i>
+                                                <p class="empty-state-title">Nenhuma atividade recente</p>
+                                                <p class="empty-state-description">As atividades aparecerão aqui quando houver registros.</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Quick Links and Events -->
+                <div class="stats-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Acesso Rápido</h3>
+                        </div>
+                        <div class="quick-links">
+                            <a href="#" class="quick-link">
+                                <i class="fas fa-user-plus"></i>
+                                <span>Novo Aluno</span>
+                            </a>
+                            <a href="#" class="quick-link">
+                                <i class="fas fa-clipboard-list"></i>
+                                <span>Nova Matrícula</span>
+                            </a>
+                            <a href="#" class="quick-link">
+                                <i class="fas fa-calendar-plus"></i>
+                                <span>Novo Evento</span>
+                            </a>
+                            <a href="#" class="quick-link">
+                                <i class="fas fa-file-export"></i>
+                                <span>Relatórios</span>
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Próximos Eventos</h3>
+                        </div>
+                        {% if eventos %}
+                            <ul class="eventos-list">
+                                {% for evento in eventos %}
+                                <li class="evento-item">
+                                    <div class="evento-header">
+                                        <span class="evento-title">{{ evento.titulo }}</span>
+                                        <span class="evento-date">{{ evento.data }}</span>
+                                    </div>
+                                    <p class="evento-description">{{ evento.descricao }}</p>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <div class="empty-state">
+                                <i class="fas fa-calendar-times"></i>
+                                <p class="empty-state-title">Nenhum evento programado</p>
+                                <p class="empty-state-description">Os próximos eventos aparecerão aqui quando forem agendados.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Sidebar Toggle Button for Mobile -->
+    <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle Sidebar">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <script>
+        // Toggle sidebar on mobile
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.querySelector('.sidebar');
+            const sidebarToggle = document.getElementById('sidebar-toggle');
+            
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+                
+                // Change icon based on sidebar state
+                const icon = sidebarToggle.querySelector('i');
+                if (sidebar.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', function(event) {
+                const isClickInsideSidebar = sidebar.contains(event.target);
+                const isClickOnToggle = sidebarToggle.contains(event.target);
+                
+                if (!isClickInsideSidebar && !isClickOnToggle && sidebar.classList.contains('active')) {
+                    sidebar.classList.remove('active');
+                    const icon = sidebarToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

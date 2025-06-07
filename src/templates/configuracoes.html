@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - Escolinha de Skate do Bob</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
+    <style>
+        /* Estilos específicos para a página de configurações */
+        .config-container {
+            padding: 15px;
+            margin-bottom: 60px;
+        }
+        
+        .config-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .config-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .config-section {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .config-section-header {
+            background-color: #f5f5f5;
+            padding: 15px;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .config-section-header i {
+            margin-right: 10px;
+            color: #FF9F1C;
+        }
+        
+        .config-section-content {
+            padding: 15px;
+        }
+        
+        .config-item {
+            margin-bottom: 20px;
+        }
+        
+        .config-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .config-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .config-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .config-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .config-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: white;
+        }
+        
+        .config-toggle {
+            display: flex;
+            align-items: center;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-right: 10px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #FF9F1C;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .toggle-label {
+            font-weight: 500;
+        }
+        
+        .config-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-config {
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .btn-cancel {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            color: #666;
+        }
+        
+        .btn-save {
+            background-color: #FF9F1C;
+            border: none;
+            color: white;
+        }
+        
+        /* Responsividade para mobile */
+        @media (max-width: 768px) {
+            .config-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-config {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Menu Hamburguer -->
+        <div class="menu-container">
+            <input type="checkbox" id="menu-toggle">
+            <label for="menu-toggle" class="menu-button">
+                <span class="menu-icon"></span>
+            </label>
+            <div class="menu-items">
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="{{ url_for('alunos') }}" class="menu-item">
+                    <i class="fas fa-user-graduate"></i> Alunos
+                </a>
+                <a href="{{ url_for('turmas') }}" class="menu-item">
+                    <i class="fas fa-users"></i> Turmas
+                </a>
+                <a href="{{ url_for('presencas') }}" class="menu-item">
+                    <i class="fas fa-clipboard-check"></i> Presenças
+                </a>
+                <a href="{{ url_for('documentacao') }}" class="menu-item">
+                    <i class="fas fa-book"></i> Documentação
+                </a>
+                <a href="{{ url_for('configuracoes') }}" class="menu-item active">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+                <div class="menu-footer">
+                    <a href="{{ url_for('index') }}" class="btn-voltar-home">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <header class="dashboard-header">
+                <h1>Configurações do Sistema</h1>
+                <div class="user-info">
+                    <span>Olá, {{ current_user.username }}</span>
+                </div>
+            </header>
+
+            <div class="config-container">
+                <div class="config-header">
+                    <div class="config-title">Preferências e Configurações</div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header">
+                        <span><i class="fas fa-user-circle"></i> Perfil do Administrador</span>
+                    </div>
+                    <div class="config-section-content">
+                        <div class="config-item">
+                            <label class="config-label">Nome</label>
+                            <input type="text" class="config-input" value="Roberto Silva" placeholder="Seu nome completo">
+                        </div>
+                        <div class="config-item">
+                            <label class="config-label">E-mail</label>
+                            <input type="email" class="config-input" value="bob@escolinhaskate.org" placeholder="Seu e-mail">
+                        </div>
+                        <div class="config-item">
+                            <label class="config-label">Telefone</label>
+                            <input type="tel" class="config-input" value="(11) 98765-4321" placeholder="Seu telefone">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header">
+                        <span><i class="fas fa-shield-alt"></i> Segurança</span>
+                    </div>
+                    <div class="config-section-content">
+                        <div class="config-item">
+                            <label class="config-label">Senha Atual</label>
+                            <input type="password" class="config-input" placeholder="Digite sua senha atual">
+                        </div>
+                        <div class="config-item">
+                            <label class="config-label">Nova Senha</label>
+                            <input type="password" class="config-input" placeholder="Digite a nova senha">
+                        </div>
+                        <div class="config-item">
+                            <label class="config-label">Confirmar Nova Senha</label>
+                            <input type="password" class="config-input" placeholder="Confirme a nova senha">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header">
+                        <span><i class="fas fa-school"></i> Informações da Escola</span>
+                    </div>
+                    <div class="config-section-content">
+                        <div class="config-item">
+                            <label class="config-label">Nome da Escola</label>
+                            <input type="text" class="config-input" value="Escolinha de Skate do Bob" placeholder="Nome da escola">
+                        </div>
+                        <div class="config-item">
+                            <label class="config-label">Endereço</label>
+                            <input type="text" class="config-input" value="Rua das Manobras, 360 - São Paulo/SP" placeholder="Endereço completo">
+                        </div>
+                        <div class="config-item">
+                            <label class="config-label">Descrição</label>
+                            <textarea class="config-textarea" placeholder="Descrição da escola">A Escolinha de Skate do Bob é uma ONG dedicada a ensinar skate para crianças e jovens, promovendo esporte, cultura e inclusão social.</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <div class="config-section-header">
+                        <span><i class="fas fa-bell"></i> Notificações</span>
+                    </div>
+                    <div class="config-section-content">
+                        <div class="config-item">
+                            <div class="config-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Notificações por e-mail</span>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <div class="config-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Notificações de novas matrículas</span>
+                            </div>
+                        </div>
+                        <div class="config-item">
+                            <div class="config-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span class="toggle-label">Relatórios semanais</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="config-buttons">
+                    <button class="btn-config btn-cancel">Cancelar</button>
+                    <button class="btn-config btn-save">Salvar Alterações</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script para controle do menu hamburguer
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const menuItems = document.querySelector('.menu-items');
+            
+            // Fecha o menu quando um item é clicado
+            const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    menuToggle.checked = false;
+                });
+            });
+            
+            // Fecha o menu quando clicar fora dele
+            document.addEventListener('click', function(event) {
+                const isClickInsideMenu = menuItems.contains(event.target);
+                const isClickOnMenuButton = event.target.closest('.menu-button');
+                
+                if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
+                    menuToggle.checked = false;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+/* Estilos específicos para imagens na documentação */
+.doc-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 30px auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Ajustes para garantir que as imagens sejam responsivas */
+@media (max-width: 768px) {
+    .doc-image {
+        width: 100%;
+        margin: 20px auto;
+    }
+}
+
+/* Estilos para legendas de imagens */
+.doc-image-caption {
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+/* Ajustes para containers de imagens */
+.doc-image-container {
+    margin: 30px 0;
+    text-align: center;
+}
