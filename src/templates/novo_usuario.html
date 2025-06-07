@@ -1,0 +1,290 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Usuário - Escolinha de Skate do Bob</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/mobile-first.css') }}">
+    <style>
+        .form-container {
+            padding: 15px;
+            margin-bottom: 60px;
+        }
+        
+        .form-card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #fff;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: #FF9F1C;
+            box-shadow: 0 0 0 2px rgba(255, 159, 28, 0.2);
+        }
+        
+        .permissions-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+        }
+        
+        .permissions-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background-color: #FF9F1C;
+            color: white;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-container">
+        <!-- Menu Hamburguer -->
+        <div class="menu-container">
+            <input type="checkbox" id="menu-toggle">
+            <label for="menu-toggle" class="menu-button">
+                <span class="menu-icon"></span>
+            </label>
+            <div class="menu-items">
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                {% if current_user.is_admin or current_user.can_manage_alunos %}
+                <a href="{{ url_for('alunos') }}" class="menu-item">
+                    <i class="fas fa-user-graduate"></i> Alunos
+                </a>
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_manage_turmas %}
+                <a href="{{ url_for('turmas') }}" class="menu-item">
+                    <i class="fas fa-users"></i> Turmas
+                </a>
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_manage_presencas %}
+                <a href="{{ url_for('presencas') }}" class="menu-item">
+                    <i class="fas fa-clipboard-check"></i> Presenças
+                </a>
+                {% endif %}
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('usuarios') }}" class="menu-item active">
+                    <i class="fas fa-user-cog"></i> Usuários
+                </a>
+                {% endif %}
+                <a href="{{ url_for('documentacao') }}" class="menu-item">
+                    <i class="fas fa-book"></i> Documentação
+                </a>
+                <a href="{{ url_for('configuracoes') }}" class="menu-item">
+                    <i class="fas fa-cog"></i> Configurações
+                </a>
+                <div class="menu-footer">
+                    <a href="{{ url_for('index') }}" class="btn-voltar-home">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <header class="dashboard-header">
+                <h1>Novo Usuário</h1>
+                <div class="user-info">
+                    <span>Olá, {{ current_user.username }}</span>
+                </div>
+            </header>
+
+            <div class="form-container">
+                <div class="form-card">
+                    <h2 class="form-title">Cadastrar Novo Usuário</h2>
+                    
+                    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-danger">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="form-group">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control") }}
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control") }}
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form.password.label(class="form-label") }}
+                            {{ form.password(class="form-control", type="password") }}
+                        </div>
+                        
+                        <div class="permissions-section">
+                            <div class="permissions-title">Permissões do Usuário</div>
+                            
+                            <div class="form-group">
+                                {{ form.can_manage_alunos.label(class="form-label") }}
+                                {{ form.can_manage_alunos(class="form-control") }}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.can_manage_turmas.label(class="form-label") }}
+                                {{ form.can_manage_turmas(class="form-control") }}
+                            </div>
+                            
+                            <div class="form-group">
+                                {{ form.can_manage_presencas.label(class="form-label") }}
+                                {{ form.can_manage_presencas(class="form-control") }}
+                            </div>
+                        </div>
+                        
+                        <div class="btn-group">
+                            {{ form.submit(class="btn btn-primary") }}
+                            <a href="{{ url_for('usuarios') }}" class="btn btn-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const menuButton = document.querySelector('.menu-button');
+            const menuItems = document.querySelector('.menu-items');
+            
+            if (menuButton) {
+                menuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (menuToggle) {
+                        menuToggle.checked = !menuToggle.checked;
+                    }
+                });
+            }
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+            
+            const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (menuToggle) {
+                        menuToggle.checked = false;
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+            
+            document.addEventListener('click', function(event) {
+                if (!menuItems || !menuToggle) return;
+                
+                const isClickInsideMenu = menuItems.contains(event.target);
+                const isClickOnMenuButton = event.target.closest('.menu-button');
+                
+                if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
+                    menuToggle.checked = false;
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

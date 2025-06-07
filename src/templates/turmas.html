@@ -195,15 +195,26 @@
                 <a href="{{ url_for('dashboard') }}" class="menu-item">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
+                {% if current_user.is_admin or current_user.can_manage_alunos %}
                 <a href="{{ url_for('alunos') }}" class="menu-item">
                     <i class="fas fa-user-graduate"></i> Alunos
                 </a>
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_manage_turmas %}
                 <a href="{{ url_for('turmas') }}" class="menu-item active">
                     <i class="fas fa-users"></i> Turmas
                 </a>
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_manage_presencas %}
                 <a href="{{ url_for('presencas') }}" class="menu-item">
                     <i class="fas fa-clipboard-check"></i> Presenças
                 </a>
+                {% endif %}
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('usuarios') }}" class="menu-item">
+                    <i class="fas fa-user-cog"></i> Usuários
+                </a>
+                {% endif %}
                 <a href="{{ url_for('documentacao') }}" class="menu-item">
                     <i class="fas fa-book"></i> Documentação
                 </a>
@@ -304,26 +315,51 @@
     </div>
 
     <script>
-        // Script para controle do menu hamburguer
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menu-toggle');
+            const menuButton = document.querySelector('.menu-button');
             const menuItems = document.querySelector('.menu-items');
             
-            // Fecha o menu quando um item é clicado
+            if (menuButton) {
+                menuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (menuToggle) {
+                        menuToggle.checked = !menuToggle.checked;
+                    }
+                });
+            }
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+            
             const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
             menuLinks.forEach(link => {
                 link.addEventListener('click', function() {
-                    menuToggle.checked = false;
+                    if (menuToggle) {
+                        menuToggle.checked = false;
+                        document.body.style.overflow = '';
+                    }
                 });
             });
             
-            // Fecha o menu quando clicar fora dele
             document.addEventListener('click', function(event) {
+                if (!menuItems || !menuToggle) return;
+                
                 const isClickInsideMenu = menuItems.contains(event.target);
                 const isClickOnMenuButton = event.target.closest('.menu-button');
                 
                 if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
                     menuToggle.checked = false;
+                    document.body.style.overflow = '';
                 }
             });
         });

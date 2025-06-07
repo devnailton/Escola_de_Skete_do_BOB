@@ -21,12 +21,22 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
-# Modelo de usuário simples
-class User(UserMixin):
-    def __init__(self, id, username, password_hash):
-        self.id = id
-        self.username = username
-        self.password_hash = password_hash
+# Modelos de usuário
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+    can_manage_alunos = db.Column(db.Boolean, default=False)
+    can_manage_turmas = db.Column(db.Boolean, default=False)
+    can_manage_presencas = db.Column(db.Boolean, default=False)
+    can_view_dashboard = db.Column(db.Boolean, default=True)
+    status = db.Column(db.String(20), default='Ativo')
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<User {self.username}>'
 
 # Modelos do banco de dados
 class Aluno(db.Model):
@@ -107,13 +117,18 @@ class TurmaForm(FlaskForm):
     capacidade_maxima = StringField('Capacidade Máxima')
     submit = SubmitField('Salvar')
 
-# Usuário bob (único usuário do sistema)
-bob = User(1, 'bob', generate_password_hash('Bob@@Fatec'))
-users = {1: bob}
+class UserForm(FlaskForm):
+    username = StringField('Nome de Usuário', validators=[DataRequired(), Length(min=3, max=80)])
+    email = StringField('Email', validators=[DataRequired(), Length(min=5, max=120)])
+    password = StringField('Senha', validators=[DataRequired(), Length(min=6, max=50)])
+    can_manage_alunos = SelectField('Gerenciar Alunos', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_manage_turmas = SelectField('Gerenciar Turmas', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_manage_presencas = SelectField('Gerenciar Presenças', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    submit = SubmitField('Salvar')
 
 @login_manager.user_loader
 def load_user(user_id):
-    return users.get(int(user_id))
+    return User.query.get(int(user_id))
 
 # Rotas de autenticação
 @app.route('/')
@@ -129,8 +144,10 @@ def login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if username == 'bob' and check_password_hash(bob.password_hash, password):
-            login_user(bob)
+        user = User.query.filter_by(username=username).first()
+        
+        if user and check_password_hash(user.password_hash, password):
+            login_user(user)
             return redirect(url_for('dashboard'))
         else:
             flash('Usuário ou senha incorretos')
@@ -142,6 +159,27 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+# Decoradores de permissão
+def admin_required(f):
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_admin:
+            flash('Acesso negado. Você precisa ser administrador.')
+            return redirect(url_for('dashboard'))
+        return f(*args, **kwargs)
+    decorated_function.__name__ = f.__name__
+    return decorated_function
+
+def permission_required(permission):
+    def decorator(f):
+        def decorated_function(*args, **kwargs):
+            if not current_user.is_admin and not getattr(current_user, permission, False):
+                flash('Acesso negado. Você não tem permissão para acessar esta área.')
+                return redirect(url_for('dashboard'))
+            return f(*args, **kwargs)
+        decorated_function.__name__ = f.__name__
+        return decorated_function
+    return decorator
 
 # Rotas do dashboard
 @app.route('/dashboard')
@@ -165,12 +203,14 @@ def dashboard():
 # CRUD para Alunos
 @app.route('/alunos')
 @login_required
+@permission_required('can_manage_alunos')
 def alunos():
     alunos_lista = Aluno.query.all()
     return render_template('alunos.html', alunos=alunos_lista)
 
 @app.route('/alunos/novo', methods=['GET', 'POST'])
 @login_required
+@permission_required('can_manage_alunos')
 def novo_aluno():
     form = AlunoForm()
     form.turma_id.choices = [(0, 'Selecione uma turma')] + [(t.id, t.nome) for t in Turma.query.all()]
@@ -205,6 +245,7 @@ def novo_aluno():
 
 @app.route('/alunos/<int:aluno_id>/editar', methods=['GET', 'POST'])
 @login_required
+@permission_required('can_manage_alunos')
 def editar_aluno(aluno_id):
     aluno = Aluno.query.get_or_404(aluno_id)
     form = AlunoForm(obj=aluno)
@@ -238,6 +279,7 @@ def editar_aluno(aluno_id):
 
 @app.route('/alunos/<int:aluno_id>/excluir', methods=['POST'])
 @login_required
+@permission_required('can_manage_alunos')
 def excluir_aluno(aluno_id):
     aluno = Aluno.query.get_or_404(aluno_id)
     db.session.delete(aluno)
@@ -248,6 +290,7 @@ def excluir_aluno(aluno_id):
 # CRUD para Turmas
 @app.route('/turmas')
 @login_required
+@permission_required('can_manage_turmas')
 def turmas():
     turmas_lista = Turma.query.all()
     for turma in turmas_lista:
@@ -256,6 +299,7 @@ def turmas():
 
 @app.route('/turmas/nova', methods=['GET', 'POST'])
 @login_required
+@permission_required('can_manage_turmas')
 def nova_turma():
     form = TurmaForm()
     
@@ -279,6 +323,7 @@ def nova_turma():
 
 @app.route('/turmas/<int:turma_id>/editar', methods=['GET', 'POST'])
 @login_required
+@permission_required('can_manage_turmas')
 def editar_turma(turma_id):
     turma = Turma.query.get_or_404(turma_id)
     form = TurmaForm(obj=turma)
@@ -300,6 +345,7 @@ def editar_turma(turma_id):
 
 @app.route('/turmas/<int:turma_id>/excluir', methods=['POST'])
 @login_required
+@permission_required('can_manage_turmas')
 def excluir_turma(turma_id):
     turma = Turma.query.get_or_404(turma_id)
     db.session.delete(turma)
@@ -310,9 +356,98 @@ def excluir_turma(turma_id):
 # Rotas para Presenças
 @app.route('/presencas')
 @login_required
+@permission_required('can_manage_presencas')
 def presencas():
     presencas_lista = Presenca.query.join(Aluno).join(Turma).all()
     return render_template('presencas.html', presencas=presencas_lista)
+
+# CRUD para Usuários (apenas para admins)
+@app.route('/usuarios')
+@login_required
+@admin_required
+def usuarios():
+    usuarios_lista = User.query.all()
+    return render_template('usuarios.html', usuarios=usuarios_lista)
+
+@app.route('/usuarios/novo', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def novo_usuario():
+    form = UserForm()
+    
+    if form.validate_on_submit():
+        # Verificar se username já existe
+        existing_user = User.query.filter_by(username=form.username.data).first()
+        if existing_user:
+            flash('Nome de usuário já existe!')
+            return render_template('novo_usuario.html', form=form)
+        
+        # Verificar se email já existe
+        existing_email = User.query.filter_by(email=form.email.data).first()
+        if existing_email:
+            flash('Email já existe!')
+            return render_template('novo_usuario.html', form=form)
+        
+        usuario = User(
+            username=form.username.data,
+            email=form.email.data,
+            password_hash=generate_password_hash(form.password.data),
+            can_manage_alunos=bool(form.can_manage_alunos.data),
+            can_manage_turmas=bool(form.can_manage_turmas.data),
+            can_manage_presencas=bool(form.can_manage_presencas.data)
+        )
+        db.session.add(usuario)
+        db.session.commit()
+        flash('Usuário cadastrado com sucesso!')
+        return redirect(url_for('usuarios'))
+    
+    return render_template('novo_usuario.html', form=form)
+
+@app.route('/usuarios/<int:usuario_id>/editar', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def editar_usuario(usuario_id):
+    usuario = User.query.get_or_404(usuario_id)
+    form = UserForm(obj=usuario)
+    
+    if form.validate_on_submit():
+        # Verificar se username já existe (exceto o atual)
+        existing_user = User.query.filter(User.username == form.username.data, User.id != usuario_id).first()
+        if existing_user:
+            flash('Nome de usuário já existe!')
+            return render_template('editar_usuario.html', form=form, usuario=usuario)
+        
+        # Verificar se email já existe (exceto o atual)
+        existing_email = User.query.filter(User.email == form.email.data, User.id != usuario_id).first()
+        if existing_email:
+            flash('Email já existe!')
+            return render_template('editar_usuario.html', form=form, usuario=usuario)
+        
+        usuario.username = form.username.data
+        usuario.email = form.email.data
+        if form.password.data:  # Só atualiza senha se foi fornecida
+            usuario.password_hash = generate_password_hash(form.password.data)
+        usuario.can_manage_alunos = bool(form.can_manage_alunos.data)
+        usuario.can_manage_turmas = bool(form.can_manage_turmas.data)
+        usuario.can_manage_presencas = bool(form.can_manage_presencas.data)
+        db.session.commit()
+        flash('Usuário atualizado com sucesso!')
+        return redirect(url_for('usuarios'))
+    
+    return render_template('editar_usuario.html', form=form, usuario=usuario)
+
+@app.route('/usuarios/<int:usuario_id>/excluir', methods=['POST'])
+@login_required
+@admin_required
+def excluir_usuario(usuario_id):
+    usuario = User.query.get_or_404(usuario_id)
+    if usuario.id == current_user.id:
+        flash('Você não pode excluir seu próprio usuário!')
+        return redirect(url_for('usuarios'))
+    db.session.delete(usuario)
+    db.session.commit()
+    flash('Usuário excluído com sucesso!')
+    return redirect(url_for('usuarios'))
 
 # Outras rotas
 @app.route('/documentacao')
@@ -334,6 +469,21 @@ def contact():
 # Inicialização do banco de dados
 with app.app_context():
     db.create_all()
+    
+    # Criar usuário admin padrão (Bob) se não existir
+    admin_user = User.query.filter_by(username='bob').first()
+    if not admin_user:
+        admin = User(
+            username='bob',
+            email='bob@fatec.sp.gov.br',
+            password_hash=generate_password_hash('Bob@@Fatec'),
+            is_admin=True,
+            can_manage_alunos=True,
+            can_manage_turmas=True,
+            can_manage_presencas=True
+        )
+        db.session.add(admin)
+        db.session.commit()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

@@ -206,15 +206,26 @@
                 <a href="{{ url_for('dashboard') }}" class="menu-item active">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
+                {% if current_user.is_admin or current_user.can_manage_alunos %}
                 <a href="{{ url_for('alunos') }}" class="menu-item">
                     <i class="fas fa-user-graduate"></i> Alunos
                 </a>
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_manage_turmas %}
                 <a href="{{ url_for('turmas') }}" class="menu-item">
                     <i class="fas fa-users"></i> Turmas
                 </a>
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_manage_presencas %}
                 <a href="{{ url_for('presencas') }}" class="menu-item">
                     <i class="fas fa-clipboard-check"></i> Presenças
                 </a>
+                {% endif %}
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('usuarios') }}" class="menu-item">
+                    <i class="fas fa-user-cog"></i> Usuários
+                </a>
+                {% endif %}
                 <a href="{{ url_for('documentacao') }}" class="menu-item">
                     <i class="fas fa-book"></i> Documentação
                 </a>
@@ -343,11 +354,6 @@
             const menuButton = document.querySelector('.menu-button');
             const menuItems = document.querySelector('.menu-items');
             
-            // Debug - verificar se os elementos foram encontrados
-            console.log('Menu toggle:', menuToggle);
-            console.log('Menu button:', menuButton);
-            console.log('Menu items:', menuItems);
-            
             // Adiciona evento de clique no botão do menu
             if (menuButton) {
                 menuButton.addEventListener('click', function(e) {
@@ -356,7 +362,6 @@
                     
                     if (menuToggle) {
                         menuToggle.checked = !menuToggle.checked;
-                        console.log('Menu toggled:', menuToggle.checked);
                     }
                 });
             }
@@ -364,7 +369,6 @@
             // Adiciona evento de mudança no checkbox
             if (menuToggle) {
                 menuToggle.addEventListener('change', function() {
-                    console.log('Menu state changed:', this.checked);
                     if (this.checked) {
                         document.body.style.overflow = 'hidden';
                     } else {
