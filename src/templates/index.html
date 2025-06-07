@@ -19,11 +19,11 @@
                     <img src="{{ url_for('static', filename='images/bob.png') }}" alt="Logo" class="logo-img">
                     <span class="logo-text">Escolinha de Skate do Bob</span>
                 </div>
-                
+
                 <button id="menu-toggle" class="menu-toggle" aria-label="Menu">
                     <i class="fas fa-bars"></i>
                 </button>
-                
+
                 <div class="navbar-menu" id="mobile-menu">
                     <a href="#home" class="nav-link">Início</a>
                     <a href="#about" class="nav-link">Sobre</a>
@@ -65,7 +65,7 @@
                     A Escolinha de Skate do Bob é uma ONG dedicada a ensinar skate para crianças e jovens, promovendo esporte, cultura e inclusão social.
                 </p>
             </div>
-            
+
             <div class="about-content">
                 <div class="about-image">
                     <img src="{{ url_for('static', filename='images/bob2.png') }}" alt="Sobre nós" class="img-responsive">
@@ -75,7 +75,7 @@
                     <p class="about-description">
                         Fundada em 2010 por Roberto "Bob" Silva, a escolinha começou como um projeto pequeno na garagem de sua casa. Hoje, atendemos mais de 200 alunos por mês em nossa sede própria.
                     </p>
-                    
+
                     <div class="feature-item">
                         <div class="feature-icon">
                             <i class="fas fa-users"></i>
@@ -87,7 +87,7 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     <div class="feature-item">
                         <div class="feature-icon">
                             <i class="fas fa-eye"></i>
@@ -99,7 +99,7 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     <div class="feature-item">
                         <div class="feature-icon">
                             <i class="fas fa-heart"></i>
@@ -111,7 +111,7 @@
                             </p>
                         </div>
                     </div>
-                    
+
                     <a href="#contact" class="btn btn-dark">Seja um Voluntário</a>
                 </div>
             </div>
@@ -127,7 +127,7 @@
                     Oferecemos aulas para todas as idades e níveis, desde iniciantes até avançados. Nossos instrutores são experientes e apaixonados pelo skate.
                 </p>
             </div>
-            
+
             <div class="classes-grid">
                 <div class="class-card">
                     <div class="class-icon">
@@ -147,7 +147,7 @@
                         <a href="#contact" class="btn btn-primary btn-block">Inscreva-se</a>
                     </div>
                 </div>
-                
+
                 <div class="class-card">
                     <div class="class-icon class-icon-alt">
                         <i class="fas fa-user"></i>
@@ -166,7 +166,7 @@
                         <a href="#contact" class="btn btn-dark btn-block">Inscreva-se</a>
                     </div>
                 </div>
-                
+
                 <div class="class-card">
                     <div class="class-icon">
                         <i class="fas fa-trophy"></i>
@@ -198,7 +198,7 @@
                     Participe dos nossos eventos e competições. Uma oportunidade para mostrar suas habilidades e conhecer outros skatistas.
                 </p>
             </div>
-            
+
             <div class="events-grid">
                 <div class="event-card">
                     <div class="event-date">
@@ -223,7 +223,7 @@
                         <a href="#contact" class="btn btn-outline btn-sm">Saiba Mais</a>
                     </div>
                 </div>
-                
+
                 <div class="event-card">
                     <div class="event-date">
                         <span class="event-day">05</span>
@@ -247,7 +247,7 @@
                         <a href="#contact" class="btn btn-outline btn-sm">Saiba Mais</a>
                     </div>
                 </div>
-                
+
                 <div class="event-card">
                     <div class="event-date">
                         <span class="event-day">12</span>
@@ -284,7 +284,7 @@
                     Tem interesse em participar das aulas ou ser voluntário? Entre em contato conosco!
                 </p>
             </div>
-            
+
             <div class="contact-content">
                 <div class="contact-info">
                     <div class="contact-item">
@@ -296,7 +296,7 @@
                             <p>Rua das Manobras, 123<br>Bairro Radical, São Paulo - SP</p>
                         </div>
                     </div>
-                    
+
                     <div class="contact-item">
                         <div class="contact-icon">
                             <i class="fas fa-phone"></i>
@@ -306,7 +306,7 @@
                             <p>(11) 99999-8888</p>
                         </div>
                     </div>
-                    
+
                     <div class="contact-item">
                         <div class="contact-icon">
                             <i class="fas fa-envelope"></i>
@@ -316,7 +316,7 @@
                             <p>contato@escolinhadoskate.com.br</p>
                         </div>
                     </div>
-                    
+
                     <div class="contact-item">
                         <div class="contact-icon">
                             <i class="fas fa-clock"></i>
@@ -326,12 +326,12 @@
                             <p>Segunda a Sexta: 9h às 18h<br>Sábado: 9h às 14h</p>
                         </div>
                     </div>
-                    
+
                     <div class="social-links">
                         <a href="https://instagram.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="Instagram">
                             <i class="fab fa-instagram"></i>
                         </a>
-                        <a href="https://facebook.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="Facebook">
+                        <a href="https://facebook.com/escolinhadeskatedobob" class="social-link" target="_blank" arialabel="Facebook">
                             <i class="fab fa-facebook-f"></i>
                         </a>
                         <a href="https://youtube.com/escolinhadeskatedobob" class="social-link" target="_blank" aria-label="YouTube">
@@ -342,29 +342,29 @@
                         </a>
                     </div>
                 </div>
-                
+
                 <div class="contact-form">
                     <form action="{{ url_for('contact') }}" method="POST">
                         <div class="form-group">
                             <label for="name">Nome</label>
                             <input type="text" id="name" name="name" required class="form-control">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="email">Email</label>
                             <input type="email" id="email" name="email" required class="form-control">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="subject">Assunto</label>
                             <input type="text" id="subject" name="subject" required class="form-control">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="message">Mensagem</label>
                             <textarea id="message" name="message" rows="5" required class="form-control"></textarea>
                         </div>
-                        
+
                         <button type="submit" class="btn btn-primary btn-block">Enviar Mensagem</button>
                     </form>
                 </div>
@@ -382,7 +382,7 @@
                         <p>Transformando vidas através do skate desde 2010</p>
                     </div>
                 </div>
-                
+
                 <div class="footer-links">
                     <h4>Links Rápidos</h4>
                     <ul>
@@ -393,7 +393,7 @@
                         <li><a href="#contact">Contato</a></li>
                     </ul>
                 </div>
-                
+
                 <div class="footer-social">
                     <h4>Siga-nos</h4>
                     <div class="social-links">
@@ -412,7 +412,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="footer-bottom">
                 <p>&copy; 2025 Escolinha de Skate do Bob. Todos os direitos reservados.</p>
             </div>
@@ -424,12 +424,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menu-toggle');
             const mobileMenu = document.getElementById('mobile-menu');
-            
+
             menuToggle.addEventListener('click', function() {
                 mobileMenu.classList.toggle('active');
                 menuToggle.classList.toggle('active');
             });
-            
+
             // Close menu when clicking on a link
             const navLinks = document.querySelectorAll('.nav-link');
             navLinks.forEach(link => {
@@ -438,15 +438,15 @@
                     menuToggle.classList.remove('active');
                 });
             });
-            
+
             // Smooth scrolling
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function(e) {
                     e.preventDefault();
-                    
+
                     const targetId = this.getAttribute('href');
                     if (targetId === '#') return;
-                    
+
                     const targetElement = document.querySelector(targetId);
                     if (targetElement) {
                         window.scrollTo({

@@ -1,4 +1,4 @@
-@import url(\'https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap\');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;500;600;700&display=swap');
 
 :root {
   --primary-color: #f7a440; /* Laranja */
@@ -24,6 +24,19 @@ body {
   color: var(--text-color);
   background-color: var(--white);
   overflow-x: hidden;
+  font-size: 16px; /* Base font size for mobile */
+}
+
+/* Melhor legibilidade no mobile */
+p, li {
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+/* Botões mais touchable no mobile */
+button, .btn, a.btn {
+  min-height: 44px; /* Área de toque mínima recomendada */
+  min-width: 44px;
 }
 
 img {
@@ -68,13 +81,14 @@ section h2::after {
 /* --- Cabeçalho (Mobile First) --- */
 header {
   background-color: #000;
-  padding: 0.8rem 1rem;
+  padding: 1rem;
   position: sticky;
   top: 0;
-  z-index: 1000;
+  z-index: 999;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  min-height: 60px; /* Altura mínima para melhor UX mobile */
 }
 
 .logo {
@@ -104,6 +118,7 @@ header {
   cursor: pointer;
   background: none;
   border: none;
+  z-index: 1001;
 }
 
 .menu-toggle span {
@@ -115,46 +130,70 @@ header {
   transition: all 0.3s ease-in-out;
 }
 
+/* Animação do hamburguer quando ativo */
+.menu-toggle.active span:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px);
+}
+
+.menu-toggle.active span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.active span:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px);
+}
+
 /* Navegação Mobile (Escondida por padrão) */
 nav {
-  position: absolute;
-  top: 100%;
-  left: 0;
+  position: fixed;
+  top: 0;
+  left: -100%;
   width: 100%;
-  background-color: #111;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease-out;
+  height: 100vh;
+  background-color: rgba(17, 17, 17, 0.95);
+  backdrop-filter: blur(10px);
+  transition: left 0.3s ease-out;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 nav.show {
-  max-height: 500px;
+  left: 0;
 }
 
 nav ul {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem 0;
+  padding: 2rem 0;
+  width: 100%;
+  max-width: 300px;
 }
 
 nav ul li {
-  margin: 0.5rem 0;
-  width: 100%;
+  margin: 1rem 0;
+  width: 90%;
   text-align: center;
 }
 
 nav ul li a {
   color: var(--white);
-  padding: 0.8rem 1rem;
+  padding: 1.2rem 2rem;
   display: block;
-  font-weight: 500;
-  transition: background-color 0.3s;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border-radius: var(--border-radius);
+  transition: all 0.3s;
+  border: 2px solid transparent;
 }
 
 nav ul li a:hover {
-  background-color: var(--secondary-color);
-  color: var(--primary-color);
+  background-color: var(--primary-color);
+  color: var(--white);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
 }
 
 .login-btn {
@@ -218,13 +257,17 @@ nav ul li a:hover {
 
 .btn {
   display: inline-block;
-  padding: 0.8rem 1.5rem;
+  padding: 1rem 2rem;
   border-radius: var(--border-radius);
   font-weight: 600;
   transition: all 0.3s;
   text-align: center;
-  width: 80%; /* Largura mobile */
-  max-width: 250px;
+  width: 90%; /* Largura mobile otimizada */
+  max-width: 280px;
+  min-height: 48px; /* Área de toque adequada */
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
 .btn-primary {

@@ -100,16 +100,17 @@ body {
 .menu-items {
     position: fixed;
     top: 0;
-    left: -250px;
-    width: 250px;
+    left: -280px;
+    width: 280px;
     height: 100vh;
     background-color: white;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+    box-shadow: 2px 0 15px rgba(0,0,0,0.2);
     transition: left 0.3s ease;
     z-index: 1000;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    backdrop-filter: blur(10px);
 }
 
 #menu-toggle:checked ~ .menu-items {
@@ -117,13 +118,15 @@ body {
 }
 
 .menu-item {
-    padding: 15px 20px;
+    padding: 18px 24px;
     display: flex;
     align-items: center;
     text-decoration: none;
     color: var(--dark-color);
     border-bottom: 1px solid #f1f1f1;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
+    min-height: 56px; /* Área de toque adequada */
+    font-size: 1.1rem;
 }
 
 .menu-item i {
