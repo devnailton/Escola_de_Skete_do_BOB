@@ -203,15 +203,26 @@
                 <a href="{{ url_for('dashboard') }}" class="menu-item">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
+                {% if current_user.is_admin or current_user.can_view_alunos %}
                 <a href="{{ url_for('alunos') }}" class="menu-item">
                     <i class="fas fa-user-graduate"></i> Alunos
                 </a>
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_view_turmas %}
                 <a href="{{ url_for('turmas') }}" class="menu-item">
                     <i class="fas fa-users"></i> Turmas
                 </a>
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_view_presencas %}
                 <a href="{{ url_for('presencas') }}" class="menu-item">
                     <i class="fas fa-clipboard-check"></i> Presenças
                 </a>
+                {% endif %}
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('usuarios') }}" class="menu-item">
+                    <i class="fas fa-user-cog"></i> Usuários
+                </a>
+                {% endif %}
                 <a href="{{ url_for('documentacao') }}" class="menu-item">
                     <i class="fas fa-book"></i> Documentação
                 </a>
@@ -249,16 +260,16 @@
                     </div>
                     <div class="config-section-content">
                         <div class="config-item">
-                            <label class="config-label">Nome</label>
-                            <input type="text" class="config-input" value="Roberto Silva" placeholder="Seu nome completo">
+                            <label class="config-label">Nome de Usuário</label>
+                            <input type="text" class="config-input" value="{{ current_user.username }}" placeholder="Seu nome de usuário">
                         </div>
                         <div class="config-item">
                             <label class="config-label">E-mail</label>
-                            <input type="email" class="config-input" value="bob@escolinhaskate.org" placeholder="Seu e-mail">
+                            <input type="email" class="config-input" value="{{ current_user.email }}" placeholder="Seu e-mail">
                         </div>
                         <div class="config-item">
-                            <label class="config-label">Telefone</label>
-                            <input type="tel" class="config-input" value="(11) 98765-4321" placeholder="Seu telefone">
+                            <label class="config-label">Função</label>
+                            <input type="text" class="config-input" value="{{ current_user.role }}" readonly style="background-color: #f5f5f5;">
                         </div>
                     </div>
                 </div>

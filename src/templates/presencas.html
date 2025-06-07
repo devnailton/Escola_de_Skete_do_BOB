@@ -182,6 +182,77 @@
             margin-bottom: 20px;
         }
 
+        .btn-add {
+            background-color: #FF9F1C;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+        }
+
+        .turmas-section {
+            margin: 20px 0;
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .turmas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .turma-card {
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .turma-card h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .turma-card p {
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .presenca-details {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-badge.presente {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.ausente {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
         /* Responsividade para mobile */
         @media (max-width: 768px) {
             .filter-row {
@@ -268,47 +339,83 @@
             <div class="presencas-container">
                 <div class="presencas-header">
                     <div class="presencas-title">Registro de Presenças</div>
+                    {% if current_user.is_admin or current_user.can_create_presencas %}
+                    <a href="{{ url_for('nova_presenca') }}" class="btn-add"><i class="fas fa-plus"></i> Nova Presença</a>
+                    {% endif %}
                 </div>
 
                 <div class="presencas-filters">
-                    <div class="filter-row">
-                        <div class="filter-group">
-                            <label class="filter-label">Turma</label>
-                            <select class="filter-select">
-                                <option value="">Todas as turmas</option>
-                                <option value="1">Iniciantes - Manhã</option>
-                                <option value="2">Intermediário - Tarde</option>
-                                <option value="3">Avançado - Noite</option>
-                            </select>
+                    <form method="GET">
+                        <div class="filter-row">
+                            <div class="filter-group">
+                                <label class="filter-label">Turma</label>
+                                <select class="filter-select" name="turma_id">
+                                    <option value="">Todas as turmas</option>
+                                    {% for turma in turmas %}
+                                    <option value="{{ turma.id }}" {% if turma.id == turma_filtro %}selected{% endif %}>
+                                        {{ turma.nome }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label class="filter-label">Data</label>
+                                <input type="date" class="filter-date" name="data" value="{{ data_filtro }}">
+                            </div>
                         </div>
-                        <div class="filter-group">
-                            <label class="filter-label">Data</label>
-                            <input type="date" class="filter-date" value="{{ today }}">
+                        <div class="filter-buttons">
+                            <a href="{{ url_for('presencas') }}" class="btn-filter btn-reset">Limpar</a>
+                            <button type="submit" class="btn-filter btn-apply">Aplicar Filtros</button>
                         </div>
-                    </div>
-                    <div class="filter-buttons">
-                        <button class="btn-filter btn-reset">Limpar</button>
-                        <button class="btn-filter btn-apply">Aplicar Filtros</button>
+                    </form>
+                </div>
+
+                {% if turmas and turmas|length > 0 %}
+                <div class="turmas-section">
+                    <h3>Registrar Presença por Turma</h3>
+                    <div class="turmas-grid">
+                        {% for turma in turmas %}
+                        <div class="turma-card">
+                            <h4>{{ turma.nome }}</h4>
+                            <p>{{ turma.alunos|length }} alunos</p>
+                            {% if current_user.is_admin or current_user.can_create_presencas %}
+                            <a href="{{ url_for('registrar_presenca_turma', turma_id=turma.id) }}" class="btn btn-primary">
+                                Registrar Presenças
+                            </a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
                     </div>
                 </div>
+                {% endif %}
 
                 {% if presencas and presencas|length > 0 %}
                 <div class="presencas-list">
                     {% for presenca in presencas %}
-                    <div class="presenca-card">
-                        <div class="presenca-header">
-                            <div class="presenca-aluno">{{ presenca.aluno.nome }}</div>
-                            <div class="presenca-data">{{ presenca.data.strftime('%d/%m/%Y') }}</div>
-                        </div>
+                    <div class="presenca-item">
                         <div class="presenca-info">
-                            <div class="presenca-turma">{{ presenca.turma_rel.nome }}</div>
-                            <div class="presenca-status {{ 'presente' if presenca.presente else 'ausente' }}">
-                                {{ 'Presente' if presenca.presente else 'Ausente' }}
+                            <div class="presenca-aluno">{{ presenca.aluno.nome }}</div>
+                            <div class="presenca-details">
+                                <span class="presenca-turma">{{ presenca.turma_rel.nome }}</span>
+                                <span class="presenca-data">{{ presenca.data.strftime('%d/%m/%Y') }}</span>
                             </div>
+                            {% if presenca.observacoes %}
+                            <div class="presenca-observacoes">{{ presenca.observacoes }}</div>
+                            {% endif %}
                         </div>
-                        {% if presenca.observacoes %}
-                        <div class="presenca-observacoes">{{ presenca.observacoes }}</div>
-                        {% endif %}
+                        <div class="presenca-status">
+                            {% if current_user.is_admin or current_user.can_edit_presencas %}
+                            <form method="POST" action="{{ url_for('toggle_presenca', presenca_id=presenca.id) }}" style="display: inline;">
+                                <button type="submit" class="status-btn {{ 'btn-presente' if presenca.presente else 'btn-ausente' }}">
+                                    {{ 'Presente' if presenca.presente else 'Ausente' }}
+                                </button>
+                            </form>
+                            {% else %}
+                            <span class="status-badge {{ 'presente' if presenca.presente else 'ausente' }}">
+                                {{ 'Presente' if presenca.presente else 'Ausente' }}
+                            </span>
+                            {% endif %}
+                        </div>
                     </div>
                     {% endfor %}
                 </div>
@@ -317,7 +424,9 @@
                     <i class="fas fa-clipboard-check"></i>
                     <h3>Nenhum registro de presença</h3>
                     <p>Selecione uma turma e data para registrar presenças dos alunos.</p>
-                    <button class="btn-filter btn-apply">Iniciar Registro</button>
+                    {% if current_user.is_admin or current_user.can_create_presencas %}
+                    <a href="{{ url_for('nova_presenca') }}" class="btn-filter btn-apply">Iniciar Registro</a>
+                    {% endif %}
                 </div>
                 {% endif %}
             </div>

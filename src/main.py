@@ -28,9 +28,26 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
-    can_manage_alunos = db.Column(db.Boolean, default=False)
-    can_manage_turmas = db.Column(db.Boolean, default=False)
-    can_manage_presencas = db.Column(db.Boolean, default=False)
+    role = db.Column(db.String(20), default='Secretaria')  # 'Professor' ou 'Secretaria'
+    
+    # Permissões para Alunos
+    can_view_alunos = db.Column(db.Boolean, default=False)
+    can_create_alunos = db.Column(db.Boolean, default=False)
+    can_edit_alunos = db.Column(db.Boolean, default=False)
+    can_delete_alunos = db.Column(db.Boolean, default=False)
+    
+    # Permissões para Turmas
+    can_view_turmas = db.Column(db.Boolean, default=False)
+    can_create_turmas = db.Column(db.Boolean, default=False)
+    can_edit_turmas = db.Column(db.Boolean, default=False)
+    can_delete_turmas = db.Column(db.Boolean, default=False)
+    
+    # Permissões para Presenças
+    can_view_presencas = db.Column(db.Boolean, default=False)
+    can_create_presencas = db.Column(db.Boolean, default=False)
+    can_edit_presencas = db.Column(db.Boolean, default=False)
+    can_delete_presencas = db.Column(db.Boolean, default=False)
+    
     can_view_dashboard = db.Column(db.Boolean, default=True)
     status = db.Column(db.String(20), default='Ativo')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -121,9 +138,26 @@ class UserForm(FlaskForm):
     username = StringField('Nome de Usuário', validators=[DataRequired(), Length(min=3, max=80)])
     email = StringField('Email', validators=[DataRequired(), Length(min=5, max=120)])
     password = StringField('Senha', validators=[DataRequired(), Length(min=6, max=50)])
-    can_manage_alunos = SelectField('Gerenciar Alunos', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
-    can_manage_turmas = SelectField('Gerenciar Turmas', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
-    can_manage_presencas = SelectField('Gerenciar Presenças', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    role = SelectField('Função', choices=[('Secretaria', 'Secretaria'), ('Professor', 'Professor')])
+    
+    # Permissões para Alunos
+    can_view_alunos = SelectField('Ver Alunos', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_create_alunos = SelectField('Criar Alunos', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_edit_alunos = SelectField('Editar Alunos', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_delete_alunos = SelectField('Excluir Alunos', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    
+    # Permissões para Turmas
+    can_view_turmas = SelectField('Ver Turmas', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_create_turmas = SelectField('Criar Turmas', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_edit_turmas = SelectField('Editar Turmas', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_delete_turmas = SelectField('Excluir Turmas', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    
+    # Permissões para Presenças
+    can_view_presencas = SelectField('Ver Presenças', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_create_presencas = SelectField('Criar Presenças', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_edit_presencas = SelectField('Editar Presenças', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    can_delete_presencas = SelectField('Excluir Presenças', choices=[('0', 'Não'), ('1', 'Sim')], coerce=int)
+    
     submit = SubmitField('Salvar')
 
 @login_manager.user_loader
@@ -181,20 +215,36 @@ def permission_required(permission):
         return decorated_function
     return decorator
 
+def crud_permission_required(action, resource):
+    def decorator(f):
+        def decorated_function(*args, **kwargs):
+            permission_name = f'can_{action}_{resource}'
+            if not current_user.is_admin and not getattr(current_user, permission_name, False):
+                flash(f'Acesso negado. Você não tem permissão para {action} {resource}.')
+                return redirect(url_for('dashboard'))
+            return f(*args, **kwargs)
+        decorated_function.__name__ = f.__name__
+        return decorated_function
+    return decorator
+
 # Rotas do dashboard
 @app.route('/dashboard')
 @login_required
 def dashboard():
     alunos_count = Aluno.query.count()
     turmas_count = Turma.query.count()
-    professores_count = Professor.query.count()
+    professores_count = User.query.filter_by(role='Professor').count()
     eventos_count = 0  # Para implementar futuramente
+    
+    # Buscar professores para exibir no dashboard
+    professores = User.query.filter_by(role='Professor').all()
     
     return render_template(
         'dashboard.html',
         alunos_count=alunos_count,
         turmas_count=turmas_count,
         professores_count=professores_count,
+        professores=professores,
         eventos_count=eventos_count,
         atividades=[],
         eventos=[]
@@ -203,14 +253,14 @@ def dashboard():
 # CRUD para Alunos
 @app.route('/alunos')
 @login_required
-@permission_required('can_manage_alunos')
+@crud_permission_required('view', 'alunos')
 def alunos():
     alunos_lista = Aluno.query.all()
     return render_template('alunos.html', alunos=alunos_lista)
 
 @app.route('/alunos/novo', methods=['GET', 'POST'])
 @login_required
-@permission_required('can_manage_alunos')
+@crud_permission_required('create', 'alunos')
 def novo_aluno():
     form = AlunoForm()
     form.turma_id.choices = [(0, 'Selecione uma turma')] + [(t.id, t.nome) for t in Turma.query.all()]
@@ -245,7 +295,7 @@ def novo_aluno():
 
 @app.route('/alunos/<int:aluno_id>/editar', methods=['GET', 'POST'])
 @login_required
-@permission_required('can_manage_alunos')
+@crud_permission_required('edit', 'alunos')
 def editar_aluno(aluno_id):
     aluno = Aluno.query.get_or_404(aluno_id)
     form = AlunoForm(obj=aluno)
@@ -279,7 +329,7 @@ def editar_aluno(aluno_id):
 
 @app.route('/alunos/<int:aluno_id>/excluir', methods=['POST'])
 @login_required
-@permission_required('can_manage_alunos')
+@crud_permission_required('delete', 'alunos')
 def excluir_aluno(aluno_id):
     aluno = Aluno.query.get_or_404(aluno_id)
     db.session.delete(aluno)
@@ -290,7 +340,7 @@ def excluir_aluno(aluno_id):
 # CRUD para Turmas
 @app.route('/turmas')
 @login_required
-@permission_required('can_manage_turmas')
+@crud_permission_required('view', 'turmas')
 def turmas():
     turmas_lista = Turma.query.all()
     for turma in turmas_lista:
@@ -299,7 +349,7 @@ def turmas():
 
 @app.route('/turmas/nova', methods=['GET', 'POST'])
 @login_required
-@permission_required('can_manage_turmas')
+@crud_permission_required('create', 'turmas')
 def nova_turma():
     form = TurmaForm()
     
@@ -323,7 +373,7 @@ def nova_turma():
 
 @app.route('/turmas/<int:turma_id>/editar', methods=['GET', 'POST'])
 @login_required
-@permission_required('can_manage_turmas')
+@crud_permission_required('edit', 'turmas')
 def editar_turma(turma_id):
     turma = Turma.query.get_or_404(turma_id)
     form = TurmaForm(obj=turma)
@@ -345,7 +395,7 @@ def editar_turma(turma_id):
 
 @app.route('/turmas/<int:turma_id>/excluir', methods=['POST'])
 @login_required
-@permission_required('can_manage_turmas')
+@crud_permission_required('delete', 'turmas')
 def excluir_turma(turma_id):
     turma = Turma.query.get_or_404(turma_id)
     db.session.delete(turma)
@@ -353,13 +403,96 @@ def excluir_turma(turma_id):
     flash('Turma excluída com sucesso!')
     return redirect(url_for('turmas'))
 
+# Forms para presenças
+class PresencaForm(FlaskForm):
+    turma_id = SelectField('Turma', coerce=int, validators=[DataRequired()])
+    data = DateField('Data', default=datetime.today, validators=[DataRequired()])
+    aluno_id = SelectField('Aluno', coerce=int, validators=[DataRequired()])
+    presente = SelectField('Status', choices=[('1', 'Presente'), ('0', 'Ausente')], coerce=int)
+    observacoes = TextAreaField('Observações')
+    submit = SubmitField('Salvar')
+
 # Rotas para Presenças
 @app.route('/presencas')
 @login_required
-@permission_required('can_manage_presencas')
+@crud_permission_required('view', 'presencas')
 def presencas():
-    presencas_lista = Presenca.query.join(Aluno).join(Turma).all()
-    return render_template('presencas.html', presencas=presencas_lista)
+    from datetime import date
+    data_filtro = request.args.get('data', date.today().strftime('%Y-%m-%d'))
+    turma_id = request.args.get('turma_id', type=int)
+    
+    query = Presenca.query.join(Aluno).join(Turma)
+    
+    if data_filtro:
+        query = query.filter(Presenca.data == data_filtro)
+    if turma_id:
+        query = query.filter(Presenca.turma_id == turma_id)
+    
+    presencas_lista = query.all()
+    turmas_lista = Turma.query.all()
+    
+    return render_template('presencas.html', 
+                         presencas=presencas_lista, 
+                         turmas=turmas_lista,
+                         data_filtro=data_filtro,
+                         turma_filtro=turma_id)
+
+@app.route('/presencas/nova', methods=['GET', 'POST'])
+@login_required
+@crud_permission_required('create', 'presencas')
+def nova_presenca():
+    form = PresencaForm()
+    form.turma_id.choices = [(t.id, t.nome) for t in Turma.query.all()]
+    form.aluno_id.choices = [(a.id, a.nome) for a in Aluno.query.all()]
+    
+    if form.validate_on_submit():
+        presenca = Presenca(
+            turma_id=form.turma_id.data,
+            aluno_id=form.aluno_id.data,
+            data=form.data.data,
+            presente=bool(form.presente.data),
+            observacoes=form.observacoes.data
+        )
+        db.session.add(presenca)
+        db.session.commit()
+        flash('Presença registrada com sucesso!')
+        return redirect(url_for('presencas'))
+    
+    return render_template('nova_presenca.html', form=form)
+
+@app.route('/presencas/registrar_turma/<int:turma_id>')
+@login_required
+@crud_permission_required('create', 'presencas')
+def registrar_presenca_turma(turma_id):
+    from datetime import date
+    turma = Turma.query.get_or_404(turma_id)
+    data_hoje = date.today()
+    
+    # Verificar se já existem presenças para hoje nesta turma
+    presencas_existentes = Presenca.query.filter_by(turma_id=turma_id, data=data_hoje).all()
+    
+    if not presencas_existentes:
+        # Criar registros de presença para todos os alunos da turma
+        for aluno in turma.alunos:
+            presenca = Presenca(
+                turma_id=turma_id,
+                aluno_id=aluno.id,
+                data=data_hoje,
+                presente=False  # Default como ausente, pode ser marcado depois
+            )
+            db.session.add(presenca)
+        db.session.commit()
+    
+    return redirect(url_for('presencas', turma_id=turma_id, data=data_hoje.strftime('%Y-%m-%d')))
+
+@app.route('/presencas/<int:presenca_id>/toggle', methods=['POST'])
+@login_required
+@crud_permission_required('edit', 'presencas')
+def toggle_presenca(presenca_id):
+    presenca = Presenca.query.get_or_404(presenca_id)
+    presenca.presente = not presenca.presente
+    db.session.commit()
+    return redirect(url_for('presencas'))
 
 # CRUD para Usuários (apenas para admins)
 @app.route('/usuarios')
@@ -392,9 +525,19 @@ def novo_usuario():
             username=form.username.data,
             email=form.email.data,
             password_hash=generate_password_hash(form.password.data),
-            can_manage_alunos=bool(form.can_manage_alunos.data),
-            can_manage_turmas=bool(form.can_manage_turmas.data),
-            can_manage_presencas=bool(form.can_manage_presencas.data)
+            role=form.role.data,
+            can_view_alunos=bool(form.can_view_alunos.data),
+            can_create_alunos=bool(form.can_create_alunos.data),
+            can_edit_alunos=bool(form.can_edit_alunos.data),
+            can_delete_alunos=bool(form.can_delete_alunos.data),
+            can_view_turmas=bool(form.can_view_turmas.data),
+            can_create_turmas=bool(form.can_create_turmas.data),
+            can_edit_turmas=bool(form.can_edit_turmas.data),
+            can_delete_turmas=bool(form.can_delete_turmas.data),
+            can_view_presencas=bool(form.can_view_presencas.data),
+            can_create_presencas=bool(form.can_create_presencas.data),
+            can_edit_presencas=bool(form.can_edit_presencas.data),
+            can_delete_presencas=bool(form.can_delete_presencas.data)
         )
         db.session.add(usuario)
         db.session.commit()
@@ -427,9 +570,19 @@ def editar_usuario(usuario_id):
         usuario.email = form.email.data
         if form.password.data:  # Só atualiza senha se foi fornecida
             usuario.password_hash = generate_password_hash(form.password.data)
-        usuario.can_manage_alunos = bool(form.can_manage_alunos.data)
-        usuario.can_manage_turmas = bool(form.can_manage_turmas.data)
-        usuario.can_manage_presencas = bool(form.can_manage_presencas.data)
+        usuario.role = form.role.data
+        usuario.can_view_alunos = bool(form.can_view_alunos.data)
+        usuario.can_create_alunos = bool(form.can_create_alunos.data)
+        usuario.can_edit_alunos = bool(form.can_edit_alunos.data)
+        usuario.can_delete_alunos = bool(form.can_delete_alunos.data)
+        usuario.can_view_turmas = bool(form.can_view_turmas.data)
+        usuario.can_create_turmas = bool(form.can_create_turmas.data)
+        usuario.can_edit_turmas = bool(form.can_edit_turmas.data)
+        usuario.can_delete_turmas = bool(form.can_delete_turmas.data)
+        usuario.can_view_presencas = bool(form.can_view_presencas.data)
+        usuario.can_create_presencas = bool(form.can_create_presencas.data)
+        usuario.can_edit_presencas = bool(form.can_edit_presencas.data)
+        usuario.can_delete_presencas = bool(form.can_delete_presencas.data)
         db.session.commit()
         flash('Usuário atualizado com sucesso!')
         return redirect(url_for('usuarios'))
@@ -478,9 +631,19 @@ with app.app_context():
             email='bob@fatec.sp.gov.br',
             password_hash=generate_password_hash('Bob@@Fatec'),
             is_admin=True,
-            can_manage_alunos=True,
-            can_manage_turmas=True,
-            can_manage_presencas=True
+            role='Administrador',
+            can_view_alunos=True,
+            can_create_alunos=True,
+            can_edit_alunos=True,
+            can_delete_alunos=True,
+            can_view_turmas=True,
+            can_create_turmas=True,
+            can_edit_turmas=True,
+            can_delete_turmas=True,
+            can_view_presencas=True,
+            can_create_presencas=True,
+            can_edit_presencas=True,
+            can_delete_presencas=True
         )
         db.session.add(admin)
         db.session.commit()

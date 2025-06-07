@@ -11,53 +11,67 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/doc-images.css') }}">
 </head>
 <body>
-    <div class="doc-container">
-        <div class="doc-sidebar">
-            <div class="doc-logo">
-                <img src="{{ url_for('static', filename='images/bob.png') }}" alt="Logo">
-                <span>Escolinha de Skate do Bob</span>
-            </div>
-            
-            <nav class="doc-nav">
-                <a href="{{ url_for('dashboard') }}" class="doc-nav-link">
+    <div class="mobile-container">
+        <!-- Menu Hamburguer -->
+        <div class="menu-container">
+            <input type="checkbox" id="menu-toggle">
+            <label for="menu-toggle" class="menu-button">
+                <span class="menu-icon"></span>
+            </label>
+            <div class="menu-items">
+                <a href="{{ url_for('dashboard') }}" class="menu-item">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
-                <a href="{{ url_for('documentacao') }}" class="doc-nav-link active">
-                    <i class="fas fa-file-alt"></i> Documentação
+                {% if current_user.is_admin or current_user.can_view_alunos %}
+                <a href="{{ url_for('alunos') }}" class="menu-item">
+                    <i class="fas fa-user-graduate"></i> Alunos
                 </a>
-                <a href="{{ url_for('alunos') }}" class="doc-nav-link">
-                    <i class="fas fa-users"></i> Alunos
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_view_turmas %}
+                <a href="{{ url_for('turmas') }}" class="menu-item">
+                    <i class="fas fa-users"></i> Turmas
                 </a>
-                <a href="{{ url_for('turmas') }}" class="doc-nav-link">
-                    <i class="fas fa-chalkboard-teacher"></i> Turmas
+                {% endif %}
+                {% if current_user.is_admin or current_user.can_view_presencas %}
+                <a href="{{ url_for('presencas') }}" class="menu-item">
+                    <i class="fas fa-clipboard-check"></i> Presenças
                 </a>
-                <a href="{{ url_for('presencas') }}" class="doc-nav-link">
-                    <i class="fas fa-calendar-check"></i> Presenças
+                {% endif %}
+                {% if current_user.is_admin %}
+                <a href="{{ url_for('usuarios') }}" class="menu-item">
+                    <i class="fas fa-user-cog"></i> Usuários
                 </a>
-                <a href="{{ url_for('configuracoes') }}" class="doc-nav-link">
+                {% endif %}
+                <a href="{{ url_for('documentacao') }}" class="menu-item active">
+                    <i class="fas fa-book"></i> Documentação
+                </a>
+                <a href="{{ url_for('configuracoes') }}" class="menu-item">
                     <i class="fas fa-cog"></i> Configurações
                 </a>
-            </nav>
-            
-            <div class="doc-nav-footer">
-                <a href="{{ url_for('index') }}" class="btn-voltar-home">
-                    <i class="fas fa-home"></i> Voltar para Home
-                </a>
-            </div>
-        </div>
-        
-        <div class="doc-content">
-            <div class="doc-header">
-                <h1 class="doc-title">Documentação do Sistema</h1>
-                <div class="doc-user">
-                    <span>Olá, {{ current_user.username }}</span>
-                    <a href="{{ url_for('logout') }}">Sair</a>
+                <div class="menu-footer">
+                    <a href="{{ url_for('index') }}" class="btn-voltar-home">
+                        <i class="fas fa-home"></i> Voltar para Home
+                    </a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">
+                        <i class="fas fa-sign-out-alt"></i> Sair
+                    </a>
                 </div>
             </div>
+        </div>
+
+        <!-- Conteúdo Principal -->
+        <div class="main-content">
+            <header class="dashboard-header">
+                <h1>Documentação do Sistema</h1>
+                <div class="user-info">
+                    <span>Olá, {{ current_user.username }}</span>
+                </div>
+            </header>
             
-            <a href="{{ url_for('dashboard') }}" class="doc-back">
-                <i class="fas fa-arrow-left"></i> Voltar para o Dashboard
-            </a>
+            <div class="doc-content">
+                <a href="{{ url_for('dashboard') }}" class="doc-back">
+                    <i class="fas fa-arrow-left"></i> Voltar para o Dashboard
+                </a>
             
             <div class="doc-section">
                 <h2 class="doc-section-title" id="visao-geral">Visão Geral</h2>
@@ -287,5 +301,56 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('menu-toggle');
+            const menuButton = document.querySelector('.menu-button');
+            const menuItems = document.querySelector('.menu-items');
+            
+            if (menuButton) {
+                menuButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (menuToggle) {
+                        menuToggle.checked = !menuToggle.checked;
+                    }
+                });
+            }
+            
+            if (menuToggle) {
+                menuToggle.addEventListener('change', function() {
+                    if (this.checked) {
+                        document.body.style.overflow = 'hidden';
+                    } else {
+                        document.body.style.overflow = '';
+                    }
+                });
+            }
+            
+            const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
+            menuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    if (menuToggle) {
+                        menuToggle.checked = false;
+                        document.body.style.overflow = '';
+                    }
+                });
+            });
+            
+            document.addEventListener('click', function(event) {
+                if (!menuItems || !menuToggle) return;
+                
+                const isClickInsideMenu = menuItems.contains(event.target);
+                const isClickOnMenuButton = event.target.closest('.menu-button');
+                
+                if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
+                    menuToggle.checked = false;
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
