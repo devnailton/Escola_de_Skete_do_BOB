@@ -13,20 +13,20 @@
             padding: 15px;
             margin-bottom: 60px;
         }
-        
+
         .presencas-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        
+
         .presencas-title {
             font-size: 1.5rem;
             font-weight: 600;
             color: #333;
         }
-        
+
         .presencas-filters {
             background-color: white;
             border-radius: 8px;
@@ -34,24 +34,24 @@
             margin-bottom: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
+
         .filter-row {
             display: flex;
             gap: 15px;
             margin-bottom: 15px;
         }
-        
+
         .filter-group {
             flex: 1;
         }
-        
+
         .filter-label {
             display: block;
             margin-bottom: 5px;
             font-weight: 500;
             color: #555;
         }
-        
+
         .filter-select {
             width: 100%;
             padding: 8px 10px;
@@ -59,46 +59,46 @@
             border-radius: 4px;
             background-color: #f9f9f9;
         }
-        
+
         .filter-date {
             width: 100%;
             padding: 8px 10px;
             border: 1px solid #ddd;
             border-radius: 4px;
         }
-        
+
         .filter-buttons {
             display: flex;
             justify-content: flex-end;
             gap: 10px;
         }
-        
+
         .btn-filter {
             padding: 8px 15px;
             border-radius: 4px;
             font-weight: 500;
             cursor: pointer;
         }
-        
+
         .btn-reset {
             background-color: #f5f5f5;
             border: 1px solid #ddd;
             color: #666;
         }
-        
+
         .btn-apply {
             background-color: #FF9F1C;
             border: none;
             color: white;
         }
-        
+
         .presencas-list {
             background-color: white;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
+
         .presenca-date-header {
             background-color: #f5f5f5;
             padding: 12px 15px;
@@ -106,7 +106,7 @@
             color: #333;
             border-bottom: 1px solid #eee;
         }
-        
+
         .presenca-item {
             padding: 15px;
             border-bottom: 1px solid #eee;
@@ -114,26 +114,26 @@
             justify-content: space-between;
             align-items: center;
         }
-        
+
         .presenca-info {
             flex: 1;
         }
-        
+
         .presenca-aluno {
             font-weight: 500;
             margin-bottom: 5px;
         }
-        
+
         .presenca-turma {
             font-size: 0.9rem;
             color: #666;
         }
-        
+
         .presenca-status {
             display: flex;
             gap: 10px;
         }
-        
+
         .status-btn {
             border: none;
             padding: 5px 10px;
@@ -141,22 +141,22 @@
             font-weight: 500;
             cursor: pointer;
         }
-        
+
         .btn-presente {
             background-color: #4CAF50;
             color: white;
         }
-        
+
         .btn-ausente {
             background-color: #F44336;
             color: white;
         }
-        
+
         .btn-justificado {
             background-color: #FF9800;
             color: white;
         }
-        
+
         .empty-state {
             text-align: center;
             padding: 40px 20px;
@@ -164,42 +164,42 @@
             border-radius: 8px;
             margin-top: 20px;
         }
-        
+
         .empty-state i {
             font-size: 3rem;
             color: #ccc;
             margin-bottom: 15px;
         }
-        
+
         .empty-state h3 {
             font-size: 1.2rem;
             color: #666;
             margin-bottom: 10px;
         }
-        
+
         .empty-state p {
             color: #888;
             margin-bottom: 20px;
         }
-        
+
         /* Responsividade para mobile */
         @media (max-width: 768px) {
             .filter-row {
                 flex-direction: column;
                 gap: 10px;
             }
-            
+
             .presenca-item {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
+
             .presenca-status {
                 margin-top: 10px;
                 width: 100%;
                 justify-content: space-between;
             }
-            
+
             .status-btn {
                 flex: 1;
                 text-align: center;
@@ -283,21 +283,21 @@
 
                 {% if presencas and presencas|length > 0 %}
                 <div class="presencas-list">
-                    <div class="presenca-date-header">
-                        <i class="fas fa-calendar-day"></i> {{ today }}
-                    </div>
-                    
                     {% for presenca in presencas %}
-                    <div class="presenca-item">
+                    <div class="presenca-card">
+                        <div class="presenca-header">
+                            <div class="presenca-aluno">{{ presenca.aluno.nome }}</div>
+                            <div class="presenca-data">{{ presenca.data.strftime('%d/%m/%Y') }}</div>
+                        </div>
                         <div class="presenca-info">
-                            <div class="presenca-aluno">{{ presenca.aluno }}</div>
-                            <div class="presenca-turma">{{ presenca.turma }}</div>
+                            <div class="presenca-turma">{{ presenca.turma_rel.nome }}</div>
+                            <div class="presenca-status {{ 'presente' if presenca.presente else 'ausente' }}">
+                                {{ 'Presente' if presenca.presente else 'Ausente' }}
+                            </div>
                         </div>
-                        <div class="presenca-status">
-                            <button class="status-btn btn-presente">Presente</button>
-                            <button class="status-btn btn-ausente">Ausente</button>
-                            <button class="status-btn btn-justificado">Justificado</button>
-                        </div>
+                        {% if presenca.observacoes %}
+                        <div class="presenca-observacoes">{{ presenca.observacoes }}</div>
+                        {% endif %}
                     </div>
                     {% endfor %}
                 </div>
@@ -318,7 +318,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const menuToggle = document.getElementById('menu-toggle');
             const menuItems = document.querySelector('.menu-items');
-            
+
             // Fecha o menu quando um item é clicado
             const menuLinks = document.querySelectorAll('.menu-item, .btn-voltar-home, .btn-logout');
             menuLinks.forEach(link => {
@@ -326,17 +326,17 @@
                     menuToggle.checked = false;
                 });
             });
-            
+
             // Fecha o menu quando clicar fora dele
             document.addEventListener('click', function(event) {
                 const isClickInsideMenu = menuItems.contains(event.target);
                 const isClickOnMenuButton = event.target.closest('.menu-button');
-                
+
                 if (!isClickInsideMenu && !isClickOnMenuButton && menuToggle.checked) {
                     menuToggle.checked = false;
                 }
             });
-            
+
             // Simulação de funcionalidade dos botões de status
             const statusButtons = document.querySelectorAll('.status-btn');
             statusButtons.forEach(button => {
@@ -347,7 +347,7 @@
                         btn.classList.remove('active');
                         btn.style.opacity = '0.6';
                     });
-                    
+
                     // Adiciona a classe ativa ao botão clicado
                     this.classList.add('active');
                     this.style.opacity = '1';

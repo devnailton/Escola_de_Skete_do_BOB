@@ -233,8 +233,20 @@
             <div class="turmas-container">
                 <div class="turmas-header">
                     <div class="turmas-title">Lista de Turmas</div>
-                    <button class="btn-add"><i class="fas fa-plus"></i> Nova Turma</button>
+                    <a href="{{ url_for('nova_turma') }}" class="btn-add"><i class="fas fa-plus"></i> Nova Turma</a>
                 </div>
+                
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div style="margin-bottom: 20px;">
+                            {% for message in messages %}
+                                <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
 
                 {% if turmas and turmas|length > 0 %}
                 <div class="turmas-grid">
@@ -244,8 +256,10 @@
                             <div class="turma-nome">{{ turma.nome }}</div>
                             <div class="turma-faixa">{{ turma.faixa_etaria }}</div>
                             <div class="turma-actions">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                                <a href="{{ url_for('editar_turma', turma_id=turma.id) }}" class="btn-action btn-edit"><i class="fas fa-edit"></i></a>
+                                <form method="POST" action="{{ url_for('excluir_turma', turma_id=turma.id) }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir esta turma?')">
+                                    <button type="submit" class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                                </form>
                             </div>
                         </div>
                         <div class="turma-body">
@@ -282,7 +296,7 @@
                     <i class="fas fa-users"></i>
                     <h3>Nenhuma turma cadastrada</h3>
                     <p>Adicione turmas para começar a organizar suas aulas e alunos.</p>
-                    <button class="btn-add"><i class="fas fa-plus"></i> Adicionar Primeira Turma</button>
+                    <a href="{{ url_for('nova_turma') }}" class="btn-add"><i class="fas fa-plus"></i> Adicionar Primeira Turma</a>
                 </div>
                 {% endif %}
             </div>

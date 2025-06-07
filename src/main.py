@@ -1,13 +1,22 @@
+
 from flask import Flask, render_template, redirect, url_for, request, flash, session
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField, DateField, TextAreaField, SubmitField
+from wtforms.validators import DataRequired, Length
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import os
 
 # Configuração do Flask
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///escolinha.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# Configuração do Flask-Login
+# Inicialização das extensões
+db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -19,7 +28,86 @@ class User(UserMixin):
         self.username = username
         self.password_hash = password_hash
 
-# Usuário bob (único usuário do sistema) - alterado para minúsculo
+# Modelos do banco de dados
+class Aluno(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    responsavel = db.Column(db.String(100), nullable=False)
+    telefone = db.Column(db.String(20))
+    email = db.Column(db.String(100))
+    data_matricula = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    data_nascimento = db.Column(db.Date)
+    status = db.Column(db.String(20), default='Ativo')
+    observacoes = db.Column(db.Text)
+    turma_id = db.Column(db.Integer, db.ForeignKey('turma.id'))
+    
+    def __repr__(self):
+        return f'<Aluno {self.nome}>'
+
+class Turma(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    faixa_etaria = db.Column(db.String(50))
+    professor = db.Column(db.String(100))
+    dias_da_semana = db.Column(db.String(100))
+    horario_inicio = db.Column(db.String(10))
+    horario_fim = db.Column(db.String(10))
+    local = db.Column(db.String(100))
+    capacidade_maxima = db.Column(db.Integer)
+    status = db.Column(db.String(20), default='Ativa')
+    alunos = db.relationship('Aluno', backref='turma', lazy=True)
+    
+    def __repr__(self):
+        return f'<Turma {self.nome}>'
+
+class Presenca(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    aluno_id = db.Column(db.Integer, db.ForeignKey('aluno.id'), nullable=False)
+    turma_id = db.Column(db.Integer, db.ForeignKey('turma.id'), nullable=False)
+    data = db.Column(db.Date, nullable=False, default=datetime.utcnow)
+    presente = db.Column(db.Boolean, default=True)
+    observacoes = db.Column(db.Text)
+    aluno = db.relationship('Aluno', backref='presencas')
+    turma_rel = db.relationship('Turma', backref='presencas')
+    
+    def __repr__(self):
+        return f'<Presenca {self.aluno.nome} - {self.data}>'
+
+class Professor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100))
+    telefone = db.Column(db.String(20))
+    especialidade = db.Column(db.String(100))
+    data_contratacao = db.Column(db.Date, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='Ativo')
+    
+    def __repr__(self):
+        return f'<Professor {self.nome}>'
+
+# Formulários
+class AlunoForm(FlaskForm):
+    nome = StringField('Nome', validators=[DataRequired(), Length(min=2, max=100)])
+    responsavel = StringField('Responsável', validators=[DataRequired(), Length(min=2, max=100)])
+    telefone = StringField('Telefone')
+    email = StringField('Email')
+    data_nascimento = DateField('Data de Nascimento')
+    turma_id = SelectField('Turma', coerce=int)
+    observacoes = TextAreaField('Observações')
+    submit = SubmitField('Salvar')
+
+class TurmaForm(FlaskForm):
+    nome = StringField('Nome da Turma', validators=[DataRequired(), Length(min=2, max=100)])
+    faixa_etaria = StringField('Faixa Etária')
+    professor = StringField('Professor')
+    dias_da_semana = StringField('Dias da Semana')
+    horario_inicio = StringField('Horário de Início')
+    horario_fim = StringField('Horário de Fim')
+    local = StringField('Local')
+    capacidade_maxima = StringField('Capacidade Máxima')
+    submit = SubmitField('Salvar')
+
+# Usuário bob (único usuário do sistema)
 bob = User(1, 'bob', generate_password_hash('Bob@@Fatec'))
 users = {1: bob}
 
@@ -27,7 +115,7 @@ users = {1: bob}
 def load_user(user_id):
     return users.get(int(user_id))
 
-# Rotas
+# Rotas de autenticação
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -55,14 +143,14 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+# Rotas do dashboard
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    # Dados zerados para o dashboard
-    alunos_count = 0
-    turmas_count = 0
-    professores_count = 0
-    eventos_count = 0
+    alunos_count = Aluno.query.count()
+    turmas_count = Turma.query.count()
+    professores_count = Professor.query.count()
+    eventos_count = 0  # Para implementar futuramente
     
     return render_template(
         'dashboard.html',
@@ -74,31 +162,140 @@ def dashboard():
         eventos=[]
     )
 
+# CRUD para Alunos
+@app.route('/alunos')
+@login_required
+def alunos():
+    alunos_lista = Aluno.query.all()
+    return render_template('alunos.html', alunos=alunos_lista)
+
+@app.route('/alunos/novo', methods=['GET', 'POST'])
+@login_required
+def novo_aluno():
+    form = AlunoForm()
+    form.turma_id.choices = [(0, 'Selecione uma turma')] + [(t.id, t.nome) for t in Turma.query.all()]
+    
+    if form.validate_on_submit():
+        aluno = Aluno(
+            nome=form.nome.data,
+            responsavel=form.responsavel.data,
+            telefone=form.telefone.data,
+            email=form.email.data,
+            data_nascimento=form.data_nascimento.data,
+            turma_id=form.turma_id.data if form.turma_id.data != 0 else None,
+            observacoes=form.observacoes.data
+        )
+        db.session.add(aluno)
+        db.session.commit()
+        flash('Aluno cadastrado com sucesso!')
+        return redirect(url_for('alunos'))
+    
+    return render_template('novo_aluno.html', form=form)
+
+@app.route('/alunos/<int:aluno_id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_aluno(aluno_id):
+    aluno = Aluno.query.get_or_404(aluno_id)
+    form = AlunoForm(obj=aluno)
+    form.turma_id.choices = [(0, 'Selecione uma turma')] + [(t.id, t.nome) for t in Turma.query.all()]
+    
+    if form.validate_on_submit():
+        aluno.nome = form.nome.data
+        aluno.responsavel = form.responsavel.data
+        aluno.telefone = form.telefone.data
+        aluno.email = form.email.data
+        aluno.data_nascimento = form.data_nascimento.data
+        aluno.turma_id = form.turma_id.data if form.turma_id.data != 0 else None
+        aluno.observacoes = form.observacoes.data
+        db.session.commit()
+        flash('Aluno atualizado com sucesso!')
+        return redirect(url_for('alunos'))
+    
+    return render_template('editar_aluno.html', form=form, aluno=aluno)
+
+@app.route('/alunos/<int:aluno_id>/excluir', methods=['POST'])
+@login_required
+def excluir_aluno(aluno_id):
+    aluno = Aluno.query.get_or_404(aluno_id)
+    db.session.delete(aluno)
+    db.session.commit()
+    flash('Aluno excluído com sucesso!')
+    return redirect(url_for('alunos'))
+
+# CRUD para Turmas
+@app.route('/turmas')
+@login_required
+def turmas():
+    turmas_lista = Turma.query.all()
+    for turma in turmas_lista:
+        turma.alunos_count = len(turma.alunos)
+    return render_template('turmas.html', turmas=turmas_lista)
+
+@app.route('/turmas/nova', methods=['GET', 'POST'])
+@login_required
+def nova_turma():
+    form = TurmaForm()
+    
+    if form.validate_on_submit():
+        turma = Turma(
+            nome=form.nome.data,
+            faixa_etaria=form.faixa_etaria.data,
+            professor=form.professor.data,
+            dias_da_semana=form.dias_da_semana.data,
+            horario_inicio=form.horario_inicio.data,
+            horario_fim=form.horario_fim.data,
+            local=form.local.data,
+            capacidade_maxima=int(form.capacidade_maxima.data) if form.capacidade_maxima.data else None
+        )
+        db.session.add(turma)
+        db.session.commit()
+        flash('Turma cadastrada com sucesso!')
+        return redirect(url_for('turmas'))
+    
+    return render_template('nova_turma.html', form=form)
+
+@app.route('/turmas/<int:turma_id>/editar', methods=['GET', 'POST'])
+@login_required
+def editar_turma(turma_id):
+    turma = Turma.query.get_or_404(turma_id)
+    form = TurmaForm(obj=turma)
+    
+    if form.validate_on_submit():
+        turma.nome = form.nome.data
+        turma.faixa_etaria = form.faixa_etaria.data
+        turma.professor = form.professor.data
+        turma.dias_da_semana = form.dias_da_semana.data
+        turma.horario_inicio = form.horario_inicio.data
+        turma.horario_fim = form.horario_fim.data
+        turma.local = form.local.data
+        turma.capacidade_maxima = int(form.capacidade_maxima.data) if form.capacidade_maxima.data else None
+        db.session.commit()
+        flash('Turma atualizada com sucesso!')
+        return redirect(url_for('turmas'))
+    
+    return render_template('editar_turma.html', form=form, turma=turma)
+
+@app.route('/turmas/<int:turma_id>/excluir', methods=['POST'])
+@login_required
+def excluir_turma(turma_id):
+    turma = Turma.query.get_or_404(turma_id)
+    db.session.delete(turma)
+    db.session.commit()
+    flash('Turma excluída com sucesso!')
+    return redirect(url_for('turmas'))
+
+# Rotas para Presenças
+@app.route('/presencas')
+@login_required
+def presencas():
+    presencas_lista = Presenca.query.join(Aluno).join(Turma).all()
+    return render_template('presencas.html', presencas=presencas_lista)
+
+# Outras rotas
 @app.route('/documentacao')
 @login_required
 def documentacao():
     return render_template('documentacao.html')
-
-@app.route('/alunos')
-@login_required
-def alunos():
-    # Dados zerados para alunos
-    alunos_lista = []
-    return render_template('alunos.html', alunos=alunos_lista)
-
-@app.route('/turmas')
-@login_required
-def turmas():
-    # Dados zerados para turmas
-    turmas_lista = []
-    return render_template('turmas.html', turmas=turmas_lista)
-
-@app.route('/presencas')
-@login_required
-def presencas():
-    # Dados zerados para presenças
-    presencas_lista = []
-    return render_template('presencas.html', presencas=presencas_lista)
 
 @app.route('/configuracoes')
 @login_required
@@ -108,9 +305,12 @@ def configuracoes():
 @app.route('/contact', methods=['POST'])
 def contact():
     if request.method == 'POST':
-        # Apenas registra a submissão do formulário
         flash('Mensagem enviada com sucesso!')
         return redirect(url_for('index'))
+
+# Inicialização do banco de dados
+with app.app_context():
+    db.create_all()
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

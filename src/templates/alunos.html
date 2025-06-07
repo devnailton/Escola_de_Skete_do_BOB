@@ -225,8 +225,20 @@
             <div class="alunos-container">
                 <div class="alunos-header">
                     <div class="alunos-title">Lista de Alunos</div>
-                    <button class="btn-add"><i class="fas fa-plus"></i> Novo Aluno</button>
+                    <a href="{{ url_for('novo_aluno') }}" class="btn-add"><i class="fas fa-plus"></i> Novo Aluno</a>
                 </div>
+                
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <div style="margin-bottom: 20px;">
+                            {% for message in messages %}
+                                <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 10px;">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
 
                 {% if alunos and alunos|length > 0 %}
                 <!-- Visualização para desktop -->
@@ -245,11 +257,13 @@
                         <tr>
                             <td>{{ aluno.nome }}</td>
                             <td>{{ aluno.responsavel }}</td>
-                            <td>{{ aluno.data_matricula }}</td>
+                            <td>{{ aluno.data_matricula.strftime('%d/%m/%Y') if aluno.data_matricula else '-' }}</td>
                             <td>{{ aluno.status }}</td>
                             <td class="alunos-actions">
-                                <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                                <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                                <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn-action btn-edit"><i class="fas fa-edit"></i></a>
+                                <form method="POST" action="{{ url_for('excluir_aluno', aluno_id=aluno.id) }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aluno?')">
+                                    <button type="submit" class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                                </form>
                             </td>
                         </tr>
                         {% endfor %}
@@ -271,12 +285,14 @@
                             </span>
                             <span>
                                 <div class="alunos-card-label">Data de Matrícula:</div>
-                                <div>{{ aluno.data_matricula }}</div>
+                                <div>{{ aluno.data_matricula.strftime('%d/%m/%Y') if aluno.data_matricula else '-' }}</div>
                             </span>
                         </div>
                         <div class="alunos-card-actions">
-                            <button class="btn-action btn-edit"><i class="fas fa-edit"></i></button>
-                            <button class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                            <a href="{{ url_for('editar_aluno', aluno_id=aluno.id) }}" class="btn-action btn-edit"><i class="fas fa-edit"></i></a>
+                            <form method="POST" action="{{ url_for('excluir_aluno', aluno_id=aluno.id) }}" style="display: inline;" onsubmit="return confirm('Tem certeza que deseja excluir este aluno?')">
+                                <button type="submit" class="btn-action btn-delete"><i class="fas fa-trash"></i></button>
+                            </form>
                         </div>
                     </div>
                     {% endfor %}
@@ -286,7 +302,7 @@
                     <i class="fas fa-user-graduate"></i>
                     <h3>Nenhum aluno cadastrado</h3>
                     <p>Adicione alunos para começar a gerenciar suas matrículas e presenças.</p>
-                    <button class="btn-add"><i class="fas fa-plus"></i> Adicionar Primeiro Aluno</button>
+                    <a href="{{ url_for('novo_aluno') }}" class="btn-add"><i class="fas fa-plus"></i> Adicionar Primeiro Aluno</a>
                 </div>
                 {% endif %}
             </div>
